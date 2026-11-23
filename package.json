@@ -25,6 +25,7 @@
     "@whiskeysockets/baileys": "^7.0.0-rc14",
     "dotenv": "^18.0.10",
     "pino": "^10.4.0",
+    "sharp": "^0.35.5",
     "zod": "^4.6.7"
   },
   "devDependencies": {
