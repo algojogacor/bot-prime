@@ -17,6 +17,7 @@ import { MessageDeduper } from './dedupe.js';
 import { normalizeMessage } from './normalize.js';
 import type { NormalizedMessage } from './normalize.js';
 import { classifyJidPair, persistJidPair } from './participants.js';
+import { OwnershipLease } from './lease.js';
 
 const log = childLogger({ mod: 'whatsapp' });
 const baileysLog = childLogger({ mod: 'baileys' });
@@ -80,12 +81,14 @@ export class WhatsAppService {
   private readonly deduper = new MessageDeduper();
   private readonly rawRecent = new Map<string, WAMessage[]>();
   private readonly collector: BurstCollector<NormalizedMessage>;
+  private readonly lease: OwnershipLease;
 
   constructor(private readonly opts: WhatsAppServiceOptions) {
     this.collector = new BurstCollector<NormalizedMessage>(
       opts.burstWindowMs ?? 2_500,
       (chatJid, msgs) => this.opts.onMessages(chatJid, msgs),
     );
+    this.lease = new OwnershipLease(opts.db, 'whatsapp-socket');
   }
 
   isReady(): boolean {
@@ -114,6 +117,7 @@ export class WhatsAppService {
       }
     }
     await this.collector.stop();
+    await this.lease.release().catch(() => undefined);
   }
 
   /** Send a text message with a human-like typing pause. */
@@ -144,6 +148,12 @@ export class WhatsAppService {
 
   private async connect(): Promise<void> {
     this.status = 'connecting';
+    // Fencing: a Koyeb deploy overlap must not produce two live sockets.
+    const acquired = await this.lease.acquire();
+    if (!acquired) {
+      this.status = 'stopped';
+      throw new Error('another instance holds the WhatsApp socket lease');
+    }
     const { state, saveCreds } = await useDbAuthState(this.opts.db, env.AUTH_ENCRYPTION_KEY);
 
     // fetchLatestBaileysVersion hits the network; fall back to the bundled version offline.
@@ -244,11 +254,20 @@ export class WhatsAppService {
   }
 
   private async onUpsert(upsert: Upsert): Promise<void> {
+    // 'append' = offline/reconnect replay of older messages. Processing those
+    // would make the bot react to stale conversations after every redeploy.
+    if (upsert.type === 'append') {
+      return;
+    }
+    const selfJid = this.sock?.user?.id;
     const batch: NormalizedMessage[] = [];
     for (const waMsg of upsert.messages as WAMessage[]) {
       const norm = normalizeMessage(waMsg);
       if (!norm || norm.type === 'protocolMessage') continue;
       if (this.deduper.check(norm.id)) continue;
+      if (selfJid && norm.mentionedJids?.length) {
+        norm.mentionsMe = norm.mentionedJids.some((j) => sameJidUser(j, selfJid));
+      }
       this.storeRaw(norm.chatJid, waMsg);
       batch.push(norm);
     }
@@ -278,4 +297,18 @@ export class WhatsAppService {
     if (ring.length > 10) ring.splice(0, ring.length - 10);
     this.rawRecent.set(chatJid, ring);
   }
+}
+
+/**
+ * Loose JID identity match for mention detection: compares digit bodies,
+ * tolerating device suffixes (`:12`) and PN↔LID alternates via their last
+ * 9 digits (same convention as the admin matcher).
+ */
+export function sameJidUser(a: string, b: string): boolean {
+  const clean = (j: string) => (j.split(':')[0] ?? '').replace(/\D/g, '');
+  const da = clean(a);
+  const dbb = clean(b);
+  if (da.length === 0 || dbb.length === 0) return false;
+  if (da === dbb) return true;
+  return da.length >= 9 && dbb.length >= 9 && da.slice(-9) === dbb.slice(-9);
 }

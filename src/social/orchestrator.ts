@@ -12,6 +12,7 @@ import { buildMemoryContext } from '../memory/retrieval.js';
 import { getGroupMeta } from '../db/repos/groups.js';
 import { getGroupSettings } from '../db/repos/settings.js';
 import type { GroupSettings } from '../db/repos/settings.js';
+import { getMessageById } from '../db/repos/messages.js';
 import { shouldReply } from './participation.js';
 import type { ChatReplyState } from './participation.js';
 import { analyzeBurst } from './context-analyzer.js';
@@ -139,6 +140,14 @@ export class SocialOrchestrator {
     const state = this.replyState(chatJid);
     const now = Date.now();
     const dailyAiUsed = await getDailyCalls(this.deps.db).catch(() => 0);
+    // Reply-to-me: quoted reply to one of our messages, or an @-mention by JID
+    // (set by the service from contextInfo.mentionedJid).
+    const quotedReplyToMe =
+      last.mentionsMe === true ||
+      (last.quotedId
+        ? (await getMessageById(this.deps.db, chatJid, last.quotedId).catch(() => null))?.isFromMe ===
+          true
+        : false);
     const decision = shouldReply({
       burst: humanMessages.map((m) => ({
         sender: m.senderJid,
@@ -154,6 +163,7 @@ export class SocialOrchestrator {
         dailyAiQuota: env.OMAK_MAX_DAILY_AI_CALLS,
         dailyAiUsed,
         mode: settings.mode,
+        replyToMe: quotedReplyToMe,
       },
       now,
     });

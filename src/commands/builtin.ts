@@ -202,8 +202,12 @@ export function registerBuiltinCommands(registry: CommandRegistry, deps: Builtin
             temperature: 1,
           });
           const validation = validateReply(result.text);
+          const grounded = hasUnverifiableClaim(
+            validation.ok ? validation.text : '',
+            facts,
+          );
           await reply(
-            validation.ok
+            validation.ok && !grounded
               ? validation.text.slice(0, 400)
               : `${info.aliases[0]} ${info.messages} pesan wkwk keras banget 🗿`,
           );
@@ -245,7 +249,14 @@ export function registerBuiltinCommands(registry: CommandRegistry, deps: Builtin
           temperature: 1,
         });
         const validation = validateReply(result.text);
-        await reply(validation.ok ? validation.text : 'hm, ga bisa gw jawab sekarang 🗿');
+        const contextForTruth = [communityBlock ?? '', memoryBlock ?? ''].join('\n');
+        const grounded = hasUnverifiableClaim(
+          validation.ok ? validation.text : '',
+          contextForTruth,
+        );
+        await reply(
+          validation.ok && !grounded ? validation.text : 'hm, ga bisa gw jawab sekarang 🗿',
+        );
       } catch {
         await reply('ai lagi macet, coba lagi nnti 🗿');
       }

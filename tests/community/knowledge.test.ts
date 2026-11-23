@@ -1,5 +1,5 @@
 import { afterAll, describe, expect, it } from 'vitest';
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync, copyFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { CommunityKnowledge, queryTerms } from '../../src/community/knowledge.js';
@@ -142,7 +142,7 @@ describe('CommunityKnowledge — fallback paths', () => {
     expect(knowledge.status.indexKind).toBe('jsonl');
     const hits = knowledge.searchHistory('eclipse');
     expect(hits.map((h) => h.id)).toContain('m000001');
-    expect(hits[0].alias).toBe('Tester FP');
+    expect(hits[0]?.alias).toBe('Tester FP');
     const loreEntries = knowledge.loreFor('mandul');
     expect(loreEntries[0]?.citations[0]?.text).toContain('mandul jir timnya');
   });
@@ -179,13 +179,12 @@ describe('CommunityKnowledge — fallback paths', () => {
     const knowledge = new CommunityKnowledge({ seedDir: dir });
     knowledge.init();
     const hits = knowledge.searchHistory('eclipse');
-    expect(hits[0].alias).toBe('k1');
+    expect(hits[0]?.alias).toBe('k1');
   });
 });
 
 describe('CommunityKnowledge — copy integrity', () => {
   it('fts5 path and jsonl path agree on a known fact', () => {
-    copyFileSync;
     const fts = new CommunityKnowledge({ seedDir: SEED });
     fts.init();
     const hit = fts.searchHistory('ga buka gb prime jir', 20).find((h) => h.id === 'm076619');

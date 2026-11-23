@@ -18,6 +18,8 @@ export type ParticipationConfig = {
   dailyAiUsed: number;
   /** Persistent group mode (group_settings table). Default: balanced. */
   mode?: ParticipationMode;
+  /** The burst replies to one of the bot's messages or @-mentions the bot. */
+  replyToMe?: boolean;
 };
 
 /**
@@ -62,10 +64,12 @@ export function shouldReply(input: {
   const lowered = humanMessages
     .map((m) => m.text.toLowerCase())
     .join(' \n ');
-  const mentioned = input.config.mentionTokens.some((token) =>
-    lowered.includes(token),
-  );
-  if (mentioned) return { act: 'reply', reason: 'mentioned' };
+  const mentioned =
+    input.config.mentionTokens.some((token) => lowered.includes(token)) ||
+    input.config.replyToMe === true;
+  if (mentioned) {
+    return { act: 'reply', reason: input.config.replyToMe === true ? 'reply-to-bot' : 'mentioned' };
+  }
 
   const rng = input.rng ?? Math.random;
   if (rng() < ambientRate) {

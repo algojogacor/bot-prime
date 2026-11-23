@@ -74,6 +74,14 @@ export type NormalizedMessage = {
   text: string | null;
   type: string;
   pushName?: string;
+  /** Quoted/reply context, when the message replies to something. */
+  quotedId?: string;
+  quotedParticipant?: string;
+  quotedText?: string;
+  /** Participant JIDs explicitly @-mentioned in the message. */
+  mentionedJids?: string[];
+  /** True when the bot itself is among the mentioned JIDs (set by the service). */
+  mentionsMe?: boolean;
   /** ms epoch */
   timestamp: number;
 };
@@ -104,6 +112,23 @@ export function normalizeMessage(raw: WAMessage): NormalizedMessage | null {
 
   const { type, text } = extractContent(message);
 
+  // Quoted/reply + mention context (extended text, media captions, docs).
+  const contextInfo =
+    message.extendedTextMessage?.contextInfo ??
+    message.imageMessage?.contextInfo ??
+    message.videoMessage?.contextInfo ??
+    message.documentMessage?.contextInfo;
+  const quotedId = contextInfo?.stanzaId || undefined;
+  const quotedParticipant = contextInfo?.participant || undefined;
+  let quotedText: string | undefined;
+  if (contextInfo?.quotedMessage) {
+    const inner = unwrapMessage(contextInfo.quotedMessage);
+    if (inner) quotedText = extractContent(inner).text ?? undefined;
+  }
+  const mentionedJids = (contextInfo?.mentionedJid ?? []).filter(
+    (j): j is string => typeof j === 'string' && j.length > 0,
+  );
+
   return {
     id: key.id,
     chatJid,
@@ -115,6 +140,10 @@ export function normalizeMessage(raw: WAMessage): NormalizedMessage | null {
     text,
     type,
     pushName: raw.pushName || undefined,
+    quotedId,
+    quotedParticipant,
+    quotedText,
+    mentionedJids: mentionedJids.length > 0 ? mentionedJids : undefined,
     timestamp,
   };
 }

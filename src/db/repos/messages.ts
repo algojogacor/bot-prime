@@ -60,6 +60,31 @@ export async function listRecentMessages(
   }));
 }
 
+/** One message by (chat, id) — used for quoted-reply resolution. */
+export async function getMessageById(
+  db: Client,
+  chatJid: string,
+  id: string,
+): Promise<StoredMessage | null> {
+  const res = await db.execute({
+    sql: `SELECT id, chat_jid, sender_jid, sender_pn, text, msg_type, is_from_me, timestamp
+          FROM messages WHERE id = ? AND chat_jid = ? LIMIT 1`,
+    args: [id, chatJid],
+  });
+  const row = res.rows[0];
+  if (!row) return null;
+  return {
+    id: String(row.id),
+    chatJid: String(row.chat_jid),
+    senderJid: String(row.sender_jid),
+    senderPn: row.sender_pn == null ? undefined : String(row.sender_pn),
+    text: row.text == null ? undefined : String(row.text),
+    msgType: String(row.msg_type),
+    isFromMe: Number(row.is_from_me) === 1,
+    timestamp: Number(row.timestamp),
+  };
+}
+
 /** Delete messages older than cutoff (ms epoch); returns rows removed. */
 export async function pruneMessagesBefore(db: Client, cutoffMs: number): Promise<number> {
   const res = await db.execute({

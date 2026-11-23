@@ -149,4 +149,18 @@ export const MIGRATIONS: Migration[] = [
       )`,
     ],
   },
+  {
+    version: 6,
+    name: 'instance-lease',
+    up: [
+      // Single-writer fencing for the WhatsApp socket: Koyeb deploys overlap
+      // briefly; only the lease holder may run a live connection.
+      `CREATE TABLE instance_lease (
+        resource TEXT PRIMARY KEY,
+        holder TEXT NOT NULL,
+        expires_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )`,
+    ],
+  },
 ];
