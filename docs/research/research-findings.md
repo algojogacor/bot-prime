@@ -40,10 +40,15 @@ Corpus evidence: statistical analysis of the target community's WhatsApp export 
 
 ### 2.1 Identity validation (closed)
 
-- The archive is the group **AVOID PRIME | FT**, created inside the WhatsApp community **AVOID CITY** (from the export's system lines).
-- "GB Prime" is a different group that this group talks *about*: only 3 mentions of "gb prime" exist, e.g. "@all yg gb prime di turnamen itu untuk fokus di turnamen yak" — i.e. an instruction to members of the other group during a tournament. This archive is NOT GB Prime.
-- The token "fp" (2,888 occurrences) marks the Flash Peak / FP circle this branch belongs to; "avoid" (386) and "prime" (499) corroborate the group name.
+- The archive is the group **AVOID PRIME | FT**, created 2026-09-28 inside the WhatsApp community **AVOID CITY** (from the export's system lines; msg `m000002` in the normalized dataset).
+- "GB Prime" is a colloquial reference to *Grup Besar Prime* — a related group in the same AVOID CITY ecosystem, not an unrelated community and not this group's name. It appears 3 times by name plus 1 direct comparison ("tp emg dibandingin prime/gb lebih rame prime"): a tournament focus call, a quiet-day complaint, an offhand remark. This archive IS AVOID PRIME | FT, and GB Prime references are in-ecosystem shorthand. (Reconciliation: docs/audit/community-dataset-audit.md §2.)
+- The token "fp" (2,887 occurrences, word-boundary) marks the Flash Peak / FP circle this branch belongs to; "avoid" (386) and "prime" (499) corroborate the group name.
 - Conclusion: proceed using this export as the canonical language sample for Omak.
+
+> **Audit update (2026-11-23):** all corpus numbers in §2.2–2.6 were re-derived by
+> the reproducible pipeline (`scripts/dataset/` → `data/seed/statistics.json`).
+> Values below reflect the recomputed metrics where they differ; the itemized
+> old-vs-new reconciliation is in docs/audit/community-dataset-audit.md §5.3.
 
 ### 2.2 Volume, rhythm, participation
 
@@ -53,13 +58,13 @@ Corpus evidence: statistical analysis of the target community's WhatsApp export 
 - Weekday ranking: Sunday highest (15,563), Wednesday (12,336) and Thursday (11,919) next, Tuesday lowest (8,949).
 - Participation concentration: top-1 participant 27.6% of messages, top-5 79.5%, top-10 94.8%; ten participants have 1,000+ messages.
   - Implication: the bot must blend into an existing fast core of ~10 very active people; flooding it would be instantly noticeable and annoying.
-- Burst structure: 62.7% of sending-bursts are a single message, 22.0% are two messages → people fire short, separate lines rather than paragraphs.
+- Burst structure: 62.9% of sending-bursts are a single message, 22.1% are two messages → people fire short, separate lines rather than paragraphs.
 
 ### 2.3 Message shape and formatting
 
-- Length: median 12 characters / 2 tokens; 68.2% of messages are ≤3 tokens; 0.5% reach 15+ tokens.
-- Case: 34.8% of messages are entirely lowercase, 1.2% entirely uppercase.
-- Emoji appear in only 2.6% of messages (2,546 emoji total, 187 distinct).
+- Length: median 11 characters / 2 tokens; 68.1% of messages are ≤3 tokens; 0.5% reach 15+ tokens.
+- Case: 36.0% of messages are entirely lowercase, 1.2% entirely uppercase.
+- Emoji appear in only 2.6% of messages (2,547 emoji total, 180 distinct).
 - Questions: 5.2% contain a question mark.
 
 ### 2.4 Register and vocabulary (token counts from the corpus)
@@ -72,13 +77,13 @@ Corpus evidence: statistical analysis of the target community's WhatsApp export 
 - Fillers/interjections: jir 2,582, kan 839, si 552, cik 363, sih 333, mah 218, dong 211, loh 192, deh 171, yak 551, wok 1,641, weh 19, euy 10.
 - Agreement/backchannel: ya 1,344, iya 833, ok 562, oke 433, y 337, bet 324, nah 226, siap 200, iyh 159, bener 167, yoi 15, mantap 15, sip 29.
 - Intensity: bgt 173, parah 83, banget 59, amat 41.
-- Laughter: **wkwk-family 1,570** vs awokawok 13, haha-family 9, lol/lmao 7 → the bot should laugh as "wkwk/wkwkwk", never "haha" or "lol".
+- Laughter: **wkwk-family 1,598** vs awok 2, haha-family 5, lol/lmao 7 → the bot should laugh as "wkwk/wkwkwk", never "haha" or "lol".
 - Top emoji: 🗿 839, 😭 151, 😹 142, 🤣 137, 😈 103, 😂 81, 🤭 70, 🥀 64, 🧢 24, 🔥 38, 🆚 46. The moai 🗿 is the group's signature reaction; emoji use overall should stay sparse (2.6% baseline).
-- Profanity: 5,737 profanity tokens, 7.9% of messages contain at least one, 80.5 per 1,000 text messages → rough banter is normal here; the bot may roast with local flavor but must never escalate into genuine insults (see §4 truth boundary).
+- Profanity: 1,579 profanity tokens (documented 29-term list), 2.1% of messages, 22.1 per 1,000 text messages (the earlier ad-hoc pass reported 5,737 / 7.9% with a broader unrecorded list; substring matching yields 2,715) → rough banter is normal here; the bot may roast with local flavor but must never escalate into genuine insults (see §4 truth boundary).
 
 ### 2.5 English code-mixing and gaming vocabulary
 
-- Only **2.0%** of messages contain any English token (0.9% unambiguous English). Top English tokens: match 248, bro 214, no 213, game 194, sorry 148, team 118, win 89, guys 62, wait 52, the 49, nice 47, play 28.
+- Only **3.0%** of messages contain any token from the broad English list (1.8% strict gaming-only). Top English tokens: match 248, bro 214, no 213, game 194, sorry 148, team 118, win 89, guys 62, wait 52, the 49, nice 47, play 28.
   - Calibration: the academic studies in §3 describe TikTok/Instagram behavior where mixing is pervasive. THIS community is a gaming community: English appears almost exclusively as gaming/loan vocabulary, not as stylistic sentence-mixing. The bot mirrors the community (light English gaming terms), not the median TikTok Gen Z.
 - Gaming context (eFootball-style football gaming): spar 1,024, kiper 830, positions st 914 / cb 678 / wf 595 / gk, rank 377, uid, mabar, turnamen ("cut turn" 52), lawan 1,120 ("lawan siapa" 75, "lawan eclipse" 70), login 502, tim 720.
 - Squad roster messages follow a fixed template visible in n-grams: "uid posisi nickname uid anggota nama lengkap no wa" — roster posts list UID, position, nickname, full name, phone.
@@ -87,7 +92,7 @@ Corpus evidence: statistical analysis of the target community's WhatsApp export 
 
 ### 2.6 Language drift
 
-- Jaccard similarity of the top-80 token sets between the first and last third of the archive: **0.569** → a stable core with evolving slang. The language profile must be re-derived periodically (e.g. monthly) instead of being treated as static.
+- Jaccard similarity of the top-80 token sets between the first and last third of the archive: **0.553** → a stable core with evolving slang. The language profile must be re-derived periodically (e.g. monthly) instead of being treated as static.
 
 ### 2.7 Style rules derived for Omak (language profile seed)
 

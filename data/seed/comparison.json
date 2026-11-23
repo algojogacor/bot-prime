@@ -1,0 +1,191 @@
+{
+ "generated_from": "stage 3",
+ "old_source": "stats.json",
+ "summary_match": 20,
+ "summary_diff": 10,
+ "items": [
+  {
+   "metric": "totals.messages_parsed",
+   "old": 79090,
+   "new": 79090,
+   "status": "match"
+  },
+  {
+   "metric": "totals.user_messages",
+   "old": 78899,
+   "new": 78899,
+   "status": "match"
+  },
+  {
+   "metric": "totals.system_messages",
+   "old": 191,
+   "new": 191,
+   "status": "match"
+  },
+  {
+   "metric": "totals.deleted_placeholders",
+   "old": 324,
+   "new": 324,
+   "status": "match"
+  },
+  {
+   "metric": "totals.participants",
+   "old": 25,
+   "new": 25,
+   "status": "match"
+  },
+  {
+   "metric": "totals.days_active",
+   "old": 57,
+   "new": 57,
+   "status": "match"
+  },
+  {
+   "metric": "time.quiet_23_to_07_pct",
+   "old": 5.5,
+   "new": 5.5,
+   "status": "match"
+  },
+  {
+   "metric": "bursts.count",
+   "old": 47436,
+   "new": 47571,
+   "status": "diff"
+  },
+  {
+   "metric": "emoji.total",
+   "old": 2546,
+   "new": 2547,
+   "status": "diff"
+  },
+  {
+   "metric": "emoji.distinct",
+   "old": 187,
+   "new": 180,
+   "status": "diff"
+  },
+  {
+   "metric": "emoji.top1",
+   "old": 839,
+   "new": 839,
+   "status": "match"
+  },
+  {
+   "metric": "profanity.total_tokens",
+   "old": 5737,
+   "new": 1579,
+   "status": "diff"
+  },
+  {
+   "metric": "profanity.msgs_pct",
+   "old": 7.9,
+   "new": 2.1,
+   "status": "diff"
+  },
+  {
+   "metric": "drift.jaccard",
+   "old": 0.569,
+   "new": 0.553,
+   "status": "match"
+  },
+  {
+   "metric": "laughter.wkwk_family",
+   "old": 1570,
+   "new": 1598,
+   "status": "diff"
+  },
+  {
+   "metric": "length.chars_p50",
+   "old": 12.0,
+   "new": 11,
+   "status": "diff"
+  },
+  {
+   "metric": "length.pct_up_to_3_tokens",
+   "old": 68.2,
+   "new": 68.1,
+   "status": "match"
+  },
+  {
+   "metric": "length.pct_15_plus_tokens",
+   "old": 0.5,
+   "new": 0.5,
+   "status": "match"
+  },
+  {
+   "metric": "length.pct_all_lowercase",
+   "old": 34.8,
+   "new": 36.0,
+   "status": "diff"
+  },
+  {
+   "metric": "length.pct_all_uppercase",
+   "old": 1.2,
+   "new": 1.2,
+   "status": "match"
+  },
+  {
+   "metric": "formatting.pct_with_emoji",
+   "old": 2.6,
+   "new": 2.6,
+   "status": "match"
+  },
+  {
+   "metric": "formatting.pct_has_question_mark",
+   "old": 5.2,
+   "new": 5.2,
+   "status": "match"
+  },
+  {
+   "metric": "participation.top1_share_pct",
+   "old": 27.6,
+   "new": 27.6,
+   "status": "match"
+  },
+  {
+   "metric": "participation.top5_share_pct",
+   "old": 79.5,
+   "new": 79.5,
+   "status": "match"
+  },
+  {
+   "metric": "participation.top10_share_pct",
+   "old": 94.8,
+   "new": 94.8,
+   "status": "match"
+  },
+  {
+   "metric": "identity.mentions_gb_prime",
+   "old": 3,
+   "new": 3,
+   "status": "match"
+  },
+  {
+   "metric": "time.hour_histogram",
+   "old": "24-bucket",
+   "new": "24-bucket",
+   "status": "match",
+   "note": ""
+  },
+  {
+   "metric": "totals.text_messages",
+   "old": 71305,
+   "new": 71302,
+   "status": "diff",
+   "note": "old text = new text +3 caption-boundary msgs; old media 7270 = new 7024 + 249 empty-body msgs (now type=empty)"
+  },
+  {
+   "metric": "media.msgs",
+   "old": 7270,
+   "new": 7273,
+   "status": "diff",
+   "note": "old classified empty-body export lines as media; new tracks them as type=empty"
+  },
+  {
+   "metric": "top_tokens.top8_overlap",
+   "old": 8,
+   "new": 8,
+   "status": "match"
+  }
+ ]
+}

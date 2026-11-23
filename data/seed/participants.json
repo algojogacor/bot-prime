@@ -1,0 +1,446 @@
+{
+ "community": "AVOID PRIME | FT (AVOID CITY)",
+ "source_sha256": "262ae7acb1ccc09307bff54e7ae74e62b4b80272a231eaff3cae8fd521e483bd",
+ "count": 25,
+ "total_user_messages": 78899,
+ "participation_buckets": {
+  "1": 0,
+  "2_to_9": 1,
+  "10_to_99": 6,
+  "100_to_999": 8,
+  "1000_plus": 10
+ },
+ "integrity": {
+  "unattributed_user_messages": 0,
+  "distinct_keys": 25,
+  "distinct_aliases": 25,
+  "alias_collisions": {}
+ },
+ "participants": [
+  {
+   "key": "p-b1aaf84c3d",
+   "alias": "arya",
+   "aliases": [
+    "arya"
+   ],
+   "alias_type": "display-name",
+   "messages": 21807,
+   "text": 20692,
+   "media": 1098,
+   "deleted": 17,
+   "tokens": 63093,
+   "first_seen": "2026-09-28T17:41:00",
+   "last_seen": "2026-11-23T14:27:00",
+   "active_days": 57,
+   "share_pct": 27.6
+  },
+  {
+   "key": "p-801e8d0c6a",
+   "alias": "Eren Fariz FP",
+   "aliases": [
+    "Eren Fariz FP"
+   ],
+   "alias_type": "display-name",
+   "messages": 15480,
+   "text": 12685,
+   "media": 2716,
+   "deleted": 79,
+   "tokens": 38047,
+   "first_seen": "2026-10-21T06:31:00",
+   "last_seen": "2026-11-23T12:56:00",
+   "active_days": 34,
+   "share_pct": 19.6
+  },
+  {
+   "key": "p-2b0f40f631",
+   "alias": "Benned FP",
+   "aliases": [
+    "Benned FP"
+   ],
+   "alias_type": "display-name",
+   "messages": 14448,
+   "text": 14246,
+   "media": 144,
+   "deleted": 58,
+   "tokens": 41372,
+   "first_seen": "2026-09-28T17:56:00",
+   "last_seen": "2026-11-15T23:13:00",
+   "active_days": 38,
+   "share_pct": 18.3
+  },
+  {
+   "key": "p-a040377464",
+   "alias": "+CC ••••••••25",
+   "aliases": [
+    "+CC ••••••••25"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 5545,
+   "text": 4859,
+   "media": 669,
+   "deleted": 17,
+   "tokens": 18382,
+   "first_seen": "2026-10-02T12:26:00",
+   "last_seen": "2026-11-22T23:15:00",
+   "active_days": 46,
+   "share_pct": 7.0
+  },
+  {
+   "key": "p-a78c03374d",
+   "alias": "Biapis FP",
+   "aliases": [
+    "Biapis FP"
+   ],
+   "alias_type": "display-name",
+   "messages": 5428,
+   "text": 4259,
+   "media": 1103,
+   "deleted": 66,
+   "tokens": 13924,
+   "first_seen": "2026-10-11T19:04:00",
+   "last_seen": "2026-11-23T14:26:00",
+   "active_days": 44,
+   "share_pct": 6.9
+  },
+  {
+   "key": "p-c01fa926d4",
+   "alias": "Iky FP",
+   "aliases": [
+    "Iky FP"
+   ],
+   "alias_type": "display-name",
+   "messages": 4884,
+   "text": 4415,
+   "media": 421,
+   "deleted": 48,
+   "tokens": 16470,
+   "first_seen": "2026-10-16T16:34:00",
+   "last_seen": "2026-11-22T21:12:00",
+   "active_days": 38,
+   "share_pct": 6.2
+  },
+  {
+   "key": "p-1ba3a33e3b",
+   "alias": "Iki FP",
+   "aliases": [
+    "Iki FP"
+   ],
+   "alias_type": "display-name",
+   "messages": 3214,
+   "text": 3112,
+   "media": 80,
+   "deleted": 22,
+   "tokens": 9025,
+   "first_seen": "2026-09-28T17:52:00",
+   "last_seen": "2026-11-04T08:42:00",
+   "active_days": 37,
+   "share_pct": 4.1
+  },
+  {
+   "key": "p-0b210ec867",
+   "alias": "+CC ••••••••47",
+   "aliases": [
+    "+CC ••••••••47"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 1586,
+   "text": 1313,
+   "media": 273,
+   "deleted": 0,
+   "tokens": 4734,
+   "first_seen": "2026-09-28T19:12:00",
+   "last_seen": "2026-10-18T19:51:00",
+   "active_days": 21,
+   "share_pct": 2.0
+  },
+  {
+   "key": "p-89eca62742",
+   "alias": "+CC ••••••••53",
+   "aliases": [
+    "+CC ••••••••53"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 1310,
+   "text": 1270,
+   "media": 38,
+   "deleted": 2,
+   "tokens": 4386,
+   "first_seen": "2026-10-21T18:02:00",
+   "last_seen": "2026-11-08T18:56:00",
+   "active_days": 18,
+   "share_pct": 1.7
+  },
+  {
+   "key": "p-1383f38822",
+   "alias": "+CC ••••••••56",
+   "aliases": [
+    "+CC ••••••••56"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 1102,
+   "text": 985,
+   "media": 117,
+   "deleted": 0,
+   "tokens": 3691,
+   "first_seen": "2026-10-06T20:21:00",
+   "last_seen": "2026-10-21T18:09:00",
+   "active_days": 16,
+   "share_pct": 1.4
+  },
+  {
+   "key": "p-53257c0498",
+   "alias": "+CC ••••••••60",
+   "aliases": [
+    "+CC ••••••••60"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 848,
+   "text": 815,
+   "media": 33,
+   "deleted": 0,
+   "tokens": 3073,
+   "first_seen": "2026-11-05T18:14:00",
+   "last_seen": "2026-11-23T12:55:00",
+   "active_days": 19,
+   "share_pct": 1.1
+  },
+  {
+   "key": "p-b8b46c068c",
+   "alias": "+CC ••••••••51",
+   "aliases": [
+    "+CC ••••••••51"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 765,
+   "text": 740,
+   "media": 25,
+   "deleted": 0,
+   "tokens": 3423,
+   "first_seen": "2026-09-28T17:46:00",
+   "last_seen": "2026-11-22T20:24:00",
+   "active_days": 39,
+   "share_pct": 1.0
+  },
+  {
+   "key": "p-7a21a5db41",
+   "alias": "+CC ••••••••66",
+   "aliases": [
+    "+CC ••••••••66"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 636,
+   "text": 624,
+   "media": 7,
+   "deleted": 5,
+   "tokens": 2083,
+   "first_seen": "2026-10-30T18:41:00",
+   "last_seen": "2026-11-22T21:24:00",
+   "active_days": 22,
+   "share_pct": 0.8
+  },
+  {
+   "key": "p-c25b8e2b6b",
+   "alias": "+CC ••••••••70",
+   "aliases": [
+    "+CC ••••••••70"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 534,
+   "text": 450,
+   "media": 83,
+   "deleted": 1,
+   "tokens": 1418,
+   "first_seen": "2026-11-17T15:54:00",
+   "last_seen": "2026-11-23T12:54:00",
+   "active_days": 7,
+   "share_pct": 0.7
+  },
+  {
+   "key": "p-f6e1360ba8",
+   "alias": "Bunny FP",
+   "aliases": [
+    "Bunny FP"
+   ],
+   "alias_type": "display-name",
+   "messages": 513,
+   "text": 361,
+   "media": 149,
+   "deleted": 3,
+   "tokens": 2027,
+   "first_seen": "2026-10-26T18:18:00",
+   "last_seen": "2026-11-22T20:35:00",
+   "active_days": 27,
+   "share_pct": 0.7
+  },
+  {
+   "key": "p-bda0339445",
+   "alias": "+CC ••••••••15",
+   "aliases": [
+    "+CC ••••••••15"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 260,
+   "text": 229,
+   "media": 28,
+   "deleted": 3,
+   "tokens": 757,
+   "first_seen": "2026-11-04T06:41:00",
+   "last_seen": "2026-11-15T20:08:00",
+   "active_days": 11,
+   "share_pct": 0.3
+  },
+  {
+   "key": "p-4ebb1fcab9",
+   "alias": "+CC ••••••••28",
+   "aliases": [
+    "+CC ••••••••28"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 169,
+   "text": 165,
+   "media": 2,
+   "deleted": 2,
+   "tokens": 538,
+   "first_seen": "2026-10-19T11:57:00",
+   "last_seen": "2026-10-21T22:30:00",
+   "active_days": 3,
+   "share_pct": 0.2
+  },
+  {
+   "key": "p-43d9c6a8ac",
+   "alias": "+CC ••••••••74",
+   "aliases": [
+    "+CC ••••••••74"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 123,
+   "text": 122,
+   "media": 1,
+   "deleted": 0,
+   "tokens": 437,
+   "first_seen": "2026-11-17T21:47:00",
+   "last_seen": "2026-11-22T21:19:00",
+   "active_days": 6,
+   "share_pct": 0.2
+  },
+  {
+   "key": "p-34895587aa",
+   "alias": "+CC ••••••••48",
+   "aliases": [
+    "+CC ••••••••48"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 65,
+   "text": 65,
+   "media": 0,
+   "deleted": 0,
+   "tokens": 203,
+   "first_seen": "2026-09-28T17:46:00",
+   "last_seen": "2026-10-11T16:09:00",
+   "active_days": 11,
+   "share_pct": 0.1
+  },
+  {
+   "key": "p-b8a796e749",
+   "alias": "+CC ••••••••49",
+   "aliases": [
+    "+CC ••••••••49"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 63,
+   "text": 44,
+   "media": 18,
+   "deleted": 1,
+   "tokens": 150,
+   "first_seen": "2026-10-20T17:38:00",
+   "last_seen": "2026-10-20T20:21:00",
+   "active_days": 1,
+   "share_pct": 0.1
+  },
+  {
+   "key": "p-64b78a3e48",
+   "alias": "Waz",
+   "aliases": [
+    "Waz"
+   ],
+   "alias_type": "display-name",
+   "messages": 58,
+   "text": 46,
+   "media": 12,
+   "deleted": 0,
+   "tokens": 133,
+   "first_seen": "2026-11-15T19:59:00",
+   "last_seen": "2026-11-22T21:24:00",
+   "active_days": 4,
+   "share_pct": 0.1
+  },
+  {
+   "key": "p-e56124128d",
+   "alias": "+CC ••••••••50",
+   "aliases": [
+    "+CC ••••••••50"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 22,
+   "text": 19,
+   "media": 3,
+   "deleted": 0,
+   "tokens": 93,
+   "first_seen": "2026-09-28T18:16:00",
+   "last_seen": "2026-10-02T20:32:00",
+   "active_days": 4,
+   "share_pct": 0.0
+  },
+  {
+   "key": "p-29d1bbe511",
+   "alias": "+CC ••••••••02",
+   "aliases": [
+    "+CC ••••••••02"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 18,
+   "text": 14,
+   "media": 4,
+   "deleted": 0,
+   "tokens": 52,
+   "first_seen": "2026-10-18T14:28:00",
+   "last_seen": "2026-11-08T18:48:00",
+   "active_days": 4,
+   "share_pct": 0.0
+  },
+  {
+   "key": "p-08e4d9bb7d",
+   "alias": "+CC ••••••••68",
+   "aliases": [
+    "+CC ••••••••68"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 16,
+   "text": 16,
+   "media": 0,
+   "deleted": 0,
+   "tokens": 46,
+   "first_seen": "2026-11-05T20:38:00",
+   "last_seen": "2026-11-08T18:57:00",
+   "active_days": 3,
+   "share_pct": 0.0
+  },
+  {
+   "key": "p-2baaed811f",
+   "alias": "+CC ••••••••67",
+   "aliases": [
+    "+CC ••••••••67"
+   ],
+   "alias_type": "phone-masked",
+   "messages": 5,
+   "text": 5,
+   "media": 0,
+   "deleted": 0,
+   "tokens": 47,
+   "first_seen": "2026-09-28T18:02:00",
+   "last_seen": "2026-09-28T20:50:00",
+   "active_days": 1,
+   "share_pct": 0.0
+  }
+ ]
+}

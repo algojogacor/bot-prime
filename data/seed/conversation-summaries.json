@@ -1,0 +1,1348 @@
+{
+ "community": "AVOID PRIME | FT (AVOID CITY)",
+ "source_sha256": "262ae7acb1ccc09307bff54e7ae74e62b4b80272a231eaff3cae8fd521e483bd",
+ "days_count": 57,
+ "days": [
+  {
+   "date": "2026-09-28",
+   "msgs": 142,
+   "users_active": 8,
+   "media": 8,
+   "deleted": 0,
+   "empty": 1,
+   "top_tokens": [
+    "avo",
+    "cb",
+    "aku",
+    "ini",
+    "2",
+    "gw"
+   ],
+   "busiest_hour": 21,
+   "system_events": {
+    "encryption_notice": 1,
+    "group_created": 1,
+    "community_notice": 1,
+    "member_joined": 2,
+    "admin_approval": 1,
+    "group_settings": 6,
+    "member_added": 2,
+    "member_removed": 1
+   },
+   "longest_burst_len": 4
+  },
+  {
+   "date": "2026-09-29",
+   "msgs": 144,
+   "users_active": 6,
+   "media": 11,
+   "deleted": 0,
+   "empty": 1,
+   "top_tokens": [
+    "avo",
+    "aku",
+    "gw",
+    "jir",
+    "nabrak",
+    "tim"
+   ],
+   "busiest_hour": 17,
+   "system_events": {
+    "member_joined": 1,
+    "member_removed": 3,
+    "member_added": 1
+   },
+   "longest_burst_len": 6
+  },
+  {
+   "date": "2026-09-30",
+   "msgs": 55,
+   "users_active": 7,
+   "media": 2,
+   "deleted": 0,
+   "empty": 0,
+   "top_tokens": [
+    "gw",
+    "ada",
+    "bercanda",
+    "lu",
+    "di",
+    "iya"
+   ],
+   "busiest_hour": 8,
+   "system_events": {},
+   "longest_burst_len": 4
+  },
+  {
+   "date": "2026-10-01",
+   "msgs": 96,
+   "users_active": 6,
+   "media": 4,
+   "deleted": 0,
+   "empty": 0,
+   "top_tokens": [
+    "aja",
+    "bang",
+    "main",
+    "lawan",
+    "oke",
+    "aku"
+   ],
+   "busiest_hour": 12,
+   "system_events": {},
+   "longest_burst_len": 5
+  },
+  {
+   "date": "2026-10-02",
+   "msgs": 727,
+   "users_active": 8,
+   "media": 45,
+   "deleted": 1,
+   "empty": 2,
+   "top_tokens": [
+    "aja",
+    "aku",
+    "yg",
+    "gas",
+    "gw",
+    "st"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "member_added": 1,
+    "other_system": 1
+   },
+   "longest_burst_len": 6
+  },
+  {
+   "date": "2026-10-03",
+   "msgs": 1761,
+   "users_active": 6,
+   "media": 65,
+   "deleted": 5,
+   "empty": 2,
+   "top_tokens": [
+    "jir",
+    "ada",
+    "gk",
+    "aku",
+    "ak",
+    "fp"
+   ],
+   "busiest_hour": 21,
+   "system_events": {
+    "other_system": 1,
+    "group_settings": 2
+   },
+   "longest_burst_len": 11
+  },
+  {
+   "date": "2026-10-04",
+   "msgs": 1704,
+   "users_active": 7,
+   "media": 48,
+   "deleted": 1,
+   "empty": 7,
+   "top_tokens": [
+    "aku",
+    "ada",
+    "aja",
+    "jir",
+    "gw",
+    "gk"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "other_system": 1,
+    "group_settings": 2
+   },
+   "longest_burst_len": 12
+  },
+  {
+   "date": "2026-10-05",
+   "msgs": 134,
+   "users_active": 5,
+   "media": 7,
+   "deleted": 0,
+   "empty": 1,
+   "top_tokens": [
+    "jir",
+    "bisa",
+    "wkwk",
+    "kita",
+    "1",
+    "wok"
+   ],
+   "busiest_hour": 12,
+   "system_events": {
+    "other_system": 1
+   },
+   "longest_burst_len": 6
+  },
+  {
+   "date": "2026-10-06",
+   "msgs": 542,
+   "users_active": 8,
+   "media": 37,
+   "deleted": 0,
+   "empty": 1,
+   "top_tokens": [
+    "aku",
+    "wf",
+    "kita",
+    "gw",
+    "main",
+    "all"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "member_joined": 1
+   },
+   "longest_burst_len": 9
+  },
+  {
+   "date": "2026-10-07",
+   "msgs": 1006,
+   "users_active": 7,
+   "media": 95,
+   "deleted": 1,
+   "empty": 5,
+   "top_tokens": [
+    "gw",
+    "bisa",
+    "gk",
+    "di",
+    "klo",
+    "aja"
+   ],
+   "busiest_hour": 21,
+   "system_events": {
+    "other_system": 3,
+    "group_settings": 3
+   },
+   "longest_burst_len": 8
+  },
+  {
+   "date": "2026-10-08",
+   "msgs": 922,
+   "users_active": 7,
+   "media": 82,
+   "deleted": 6,
+   "empty": 5,
+   "top_tokens": [
+    "bisa",
+    "gw",
+    "jam",
+    "all",
+    "gk",
+    "aku"
+   ],
+   "busiest_hour": 21,
+   "system_events": {},
+   "longest_burst_len": 11
+  },
+  {
+   "date": "2026-10-09",
+   "msgs": 1077,
+   "users_active": 8,
+   "media": 64,
+   "deleted": 9,
+   "empty": 3,
+   "top_tokens": [
+    "gw",
+    "bisa",
+    "aku",
+    "aja",
+    "nya",
+    "klo"
+   ],
+   "busiest_hour": 21,
+   "system_events": {
+    "other_system": 3,
+    "group_settings": 1
+   },
+   "longest_burst_len": 10
+  },
+  {
+   "date": "2026-10-10",
+   "msgs": 1157,
+   "users_active": 7,
+   "media": 88,
+   "deleted": 3,
+   "empty": 6,
+   "top_tokens": [
+    "lawan",
+    "gk",
+    "gw",
+    "mau",
+    "yg",
+    "aura"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "other_system": 1,
+    "group_settings": 1
+   },
+   "longest_burst_len": 11
+  },
+  {
+   "date": "2026-10-11",
+   "msgs": 1065,
+   "users_active": 8,
+   "media": 78,
+   "deleted": 11,
+   "empty": 3,
+   "top_tokens": [
+    "aku",
+    "jir",
+    "main",
+    "nya",
+    "gk",
+    "gw"
+   ],
+   "busiest_hour": 21,
+   "system_events": {
+    "other_system": 1,
+    "member_added": 1,
+    "group_settings": 2
+   },
+   "longest_burst_len": 8
+  },
+  {
+   "date": "2026-10-12",
+   "msgs": 1109,
+   "users_active": 7,
+   "media": 52,
+   "deleted": 7,
+   "empty": 2,
+   "top_tokens": [
+    "jir",
+    "fp",
+    "aja",
+    "lawan",
+    "avo",
+    "bisa"
+   ],
+   "busiest_hour": 21,
+   "system_events": {},
+   "longest_burst_len": 10
+  },
+  {
+   "date": "2026-10-13",
+   "msgs": 1264,
+   "users_active": 8,
+   "media": 88,
+   "deleted": 6,
+   "empty": 7,
+   "top_tokens": [
+    "gk",
+    "aku",
+    "aja",
+    "fp",
+    "kita",
+    "st"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "other_system": 2,
+    "group_settings": 2
+   },
+   "longest_burst_len": 14
+  },
+  {
+   "date": "2026-10-14",
+   "msgs": 1005,
+   "users_active": 8,
+   "media": 64,
+   "deleted": 1,
+   "empty": 4,
+   "top_tokens": [
+    "fp",
+    "gw",
+    "jir",
+    "ada",
+    "jam",
+    "bisa"
+   ],
+   "busiest_hour": 21,
+   "system_events": {
+    "other_system": 1
+   },
+   "longest_burst_len": 10
+  },
+  {
+   "date": "2026-10-15",
+   "msgs": 1742,
+   "users_active": 8,
+   "media": 100,
+   "deleted": 6,
+   "empty": 5,
+   "top_tokens": [
+    "aku",
+    "jir",
+    "gk",
+    "wok",
+    "aja",
+    "main"
+   ],
+   "busiest_hour": 22,
+   "system_events": {
+    "group_settings": 3
+   },
+   "longest_burst_len": 12
+  },
+  {
+   "date": "2026-10-16",
+   "msgs": 1970,
+   "users_active": 9,
+   "media": 142,
+   "deleted": 9,
+   "empty": 5,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "jir",
+    "aku",
+    "nya",
+    "aja"
+   ],
+   "busiest_hour": 21,
+   "system_events": {
+    "group_settings": 2,
+    "member_added": 1
+   },
+   "longest_burst_len": 8
+  },
+  {
+   "date": "2026-10-17",
+   "msgs": 1435,
+   "users_active": 8,
+   "media": 52,
+   "deleted": 6,
+   "empty": 3,
+   "top_tokens": [
+    "fp",
+    "main",
+    "gw",
+    "bisa",
+    "jam",
+    "yg"
+   ],
+   "busiest_hour": 19,
+   "system_events": {},
+   "longest_burst_len": 12
+  },
+  {
+   "date": "2026-10-18",
+   "msgs": 2233,
+   "users_active": 10,
+   "media": 74,
+   "deleted": 4,
+   "empty": 3,
+   "top_tokens": [
+    "fp",
+    "aku",
+    "gw",
+    "bisa",
+    "main",
+    "ya"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "group_settings": 2,
+    "member_joined": 1
+   },
+   "longest_burst_len": 14
+  },
+  {
+   "date": "2026-10-19",
+   "msgs": 1270,
+   "users_active": 9,
+   "media": 59,
+   "deleted": 8,
+   "empty": 6,
+   "top_tokens": [
+    "gw",
+    "aja",
+    "di",
+    "main",
+    "fp",
+    "ga"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "member_added": 2
+   },
+   "longest_burst_len": 12
+  },
+  {
+   "date": "2026-10-20",
+   "msgs": 784,
+   "users_active": 10,
+   "media": 60,
+   "deleted": 4,
+   "empty": 4,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "jir",
+    "nya",
+    "main",
+    "benned"
+   ],
+   "busiest_hour": 18,
+   "system_events": {},
+   "longest_burst_len": 7
+  },
+  {
+   "date": "2026-10-21",
+   "msgs": 3817,
+   "users_active": 11,
+   "media": 350,
+   "deleted": 9,
+   "empty": 12,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "aja",
+    "main",
+    "aku",
+    "jir"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "member_joined": 2,
+    "member_removed": 3,
+    "other_system": 3,
+    "member_added": 2
+   },
+   "longest_burst_len": 11
+  },
+  {
+   "date": "2026-10-22",
+   "msgs": 1807,
+   "users_active": 8,
+   "media": 154,
+   "deleted": 11,
+   "empty": 4,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "jir",
+    "main",
+    "aku",
+    "mau"
+   ],
+   "busiest_hour": 19,
+   "system_events": {
+    "member_removed": 1,
+    "group_settings": 1
+   },
+   "longest_burst_len": 8
+  },
+  {
+   "date": "2026-10-23",
+   "msgs": 1757,
+   "users_active": 8,
+   "media": 178,
+   "deleted": 10,
+   "empty": 5,
+   "top_tokens": [
+    "gw",
+    "jir",
+    "main",
+    "aku",
+    "fp",
+    "yonkou強"
+   ],
+   "busiest_hour": 8,
+   "system_events": {},
+   "longest_burst_len": 10
+  },
+  {
+   "date": "2026-10-24",
+   "msgs": 1517,
+   "users_active": 9,
+   "media": 125,
+   "deleted": 6,
+   "empty": 7,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "main",
+    "aku",
+    "uid",
+    "avo"
+   ],
+   "busiest_hour": 19,
+   "system_events": {
+    "other_system": 1
+   },
+   "longest_burst_len": 8
+  },
+  {
+   "date": "2026-10-25",
+   "msgs": 1830,
+   "users_active": 9,
+   "media": 116,
+   "deleted": 6,
+   "empty": 1,
+   "top_tokens": [
+    "gw",
+    "aja",
+    "fp",
+    "aku",
+    "mau",
+    "ga"
+   ],
+   "busiest_hour": 19,
+   "system_events": {},
+   "longest_burst_len": 9
+  },
+  {
+   "date": "2026-10-26",
+   "msgs": 2348,
+   "users_active": 10,
+   "media": 185,
+   "deleted": 4,
+   "empty": 9,
+   "top_tokens": [
+    "gw",
+    "main",
+    "fp",
+    "bisa",
+    "ini",
+    "aku"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "other_system": 1,
+    "member_joined": 1
+   },
+   "longest_burst_len": 11
+  },
+  {
+   "date": "2026-10-27",
+   "msgs": 1611,
+   "users_active": 9,
+   "media": 133,
+   "deleted": 1,
+   "empty": 2,
+   "top_tokens": [
+    "gw",
+    "ga",
+    "jir",
+    "fp",
+    "main",
+    "aku"
+   ],
+   "busiest_hour": 14,
+   "system_events": {},
+   "longest_burst_len": 18
+  },
+  {
+   "date": "2026-10-28",
+   "msgs": 1764,
+   "users_active": 10,
+   "media": 149,
+   "deleted": 3,
+   "empty": 4,
+   "top_tokens": [
+    "gw",
+    "jir",
+    "fp",
+    "main",
+    "mau",
+    "di"
+   ],
+   "busiest_hour": 20,
+   "system_events": {},
+   "longest_burst_len": 8
+  },
+  {
+   "date": "2026-10-29",
+   "msgs": 1652,
+   "users_active": 9,
+   "media": 154,
+   "deleted": 8,
+   "empty": 7,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "main",
+    "jir",
+    "aja",
+    "ga"
+   ],
+   "busiest_hour": 19,
+   "system_events": {},
+   "longest_burst_len": 9
+  },
+  {
+   "date": "2026-10-30",
+   "msgs": 1807,
+   "users_active": 10,
+   "media": 220,
+   "deleted": 9,
+   "empty": 4,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "main",
+    "jir",
+    "mau",
+    "aja"
+   ],
+   "busiest_hour": 19,
+   "system_events": {
+    "member_joined": 1
+   },
+   "longest_burst_len": 11
+  },
+  {
+   "date": "2026-10-31",
+   "msgs": 1494,
+   "users_active": 9,
+   "media": 171,
+   "deleted": 2,
+   "empty": 5,
+   "top_tokens": [
+    "fp",
+    "gw",
+    "aku",
+    "yg",
+    "bisa",
+    "ada"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "member_joined": 1
+   },
+   "longest_burst_len": 13
+  },
+  {
+   "date": "2026-11-01",
+   "msgs": 3632,
+   "users_active": 12,
+   "media": 309,
+   "deleted": 5,
+   "empty": 9,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "main",
+    "di",
+    "jir",
+    "mau"
+   ],
+   "busiest_hour": 21,
+   "system_events": {
+    "member_joined": 1
+   },
+   "longest_burst_len": 9
+  },
+  {
+   "date": "2026-11-02",
+   "msgs": 1921,
+   "users_active": 11,
+   "media": 165,
+   "deleted": 3,
+   "empty": 9,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "main",
+    "aku",
+    "mau",
+    "jir"
+   ],
+   "busiest_hour": 20,
+   "system_events": {},
+   "longest_burst_len": 9
+  },
+  {
+   "date": "2026-11-03",
+   "msgs": 2871,
+   "users_active": 11,
+   "media": 356,
+   "deleted": 18,
+   "empty": 2,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "main",
+    "jir",
+    "aku",
+    "mau"
+   ],
+   "busiest_hour": 18,
+   "system_events": {},
+   "longest_burst_len": 9
+  },
+  {
+   "date": "2026-11-04",
+   "msgs": 2383,
+   "users_active": 12,
+   "media": 318,
+   "deleted": 15,
+   "empty": 4,
+   "top_tokens": [
+    "gw",
+    "cb",
+    "fp",
+    "mau",
+    "main",
+    "gk"
+   ],
+   "busiest_hour": 19,
+   "system_events": {
+    "member_joined": 1,
+    "other_system": 2,
+    "member_left": 1,
+    "group_settings": 1
+   },
+   "longest_burst_len": 10
+  },
+  {
+   "date": "2026-11-05",
+   "msgs": 2158,
+   "users_active": 12,
+   "media": 250,
+   "deleted": 14,
+   "empty": 12,
+   "top_tokens": [
+    "gw",
+    "jir",
+    "main",
+    "ga",
+    "yg",
+    "wok"
+   ],
+   "busiest_hour": 18,
+   "system_events": {
+    "member_added": 1,
+    "member_removed": 1,
+    "member_joined": 1
+   },
+   "longest_burst_len": 10
+  },
+  {
+   "date": "2026-11-06",
+   "msgs": 590,
+   "users_active": 11,
+   "media": 106,
+   "deleted": 3,
+   "empty": 2,
+   "top_tokens": [
+    "gw",
+    "jir",
+    "lu",
+    "biapis",
+    "ga",
+    "arya"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "other_system": 1
+   },
+   "longest_burst_len": 6
+  },
+  {
+   "date": "2026-11-07",
+   "msgs": 635,
+   "users_active": 10,
+   "media": 73,
+   "deleted": 12,
+   "empty": 4,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "yg",
+    "ga",
+    "ada",
+    "biapis"
+   ],
+   "busiest_hour": 20,
+   "system_events": {},
+   "longest_burst_len": 9
+  },
+  {
+   "date": "2026-11-08",
+   "msgs": 1362,
+   "users_active": 13,
+   "media": 103,
+   "deleted": 2,
+   "empty": 4,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "main",
+    "aja",
+    "biapis",
+    "bisa"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "member_left": 1,
+    "member_removed": 1
+   },
+   "longest_burst_len": 17
+  },
+  {
+   "date": "2026-11-09",
+   "msgs": 835,
+   "users_active": 10,
+   "media": 83,
+   "deleted": 30,
+   "empty": 1,
+   "top_tokens": [
+    "gw",
+    "jir",
+    "mau",
+    "klo",
+    "wok",
+    "fp"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "other_system": 1,
+    "group_settings": 1
+   },
+   "longest_burst_len": 9
+  },
+  {
+   "date": "2026-11-10",
+   "msgs": 643,
+   "users_active": 8,
+   "media": 62,
+   "deleted": 3,
+   "empty": 1,
+   "top_tokens": [
+    "wok",
+    "fp",
+    "mau",
+    "gw",
+    "aku",
+    "arya"
+   ],
+   "busiest_hour": 20,
+   "system_events": {},
+   "longest_burst_len": 7
+  },
+  {
+   "date": "2026-11-11",
+   "msgs": 1258,
+   "users_active": 10,
+   "media": 140,
+   "deleted": 4,
+   "empty": 4,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "jir",
+    "biapis",
+    "ga",
+    "bisa"
+   ],
+   "busiest_hour": 20,
+   "system_events": {},
+   "longest_burst_len": 10
+  },
+  {
+   "date": "2026-11-12",
+   "msgs": 998,
+   "users_active": 10,
+   "media": 83,
+   "deleted": 5,
+   "empty": 5,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "jir",
+    "anj",
+    "wok",
+    "ak"
+   ],
+   "busiest_hour": 7,
+   "system_events": {},
+   "longest_burst_len": 10
+  },
+  {
+   "date": "2026-11-13",
+   "msgs": 168,
+   "users_active": 8,
+   "media": 20,
+   "deleted": 0,
+   "empty": 0,
+   "top_tokens": [
+    "fp",
+    "biapis",
+    "gw",
+    "spar",
+    "mau",
+    "arya"
+   ],
+   "busiest_hour": 15,
+   "system_events": {},
+   "longest_burst_len": 8
+  },
+  {
+   "date": "2026-11-14",
+   "msgs": 242,
+   "users_active": 7,
+   "media": 33,
+   "deleted": 0,
+   "empty": 1,
+   "top_tokens": [
+    "fp",
+    "wok",
+    "ini",
+    "aja",
+    "bunny",
+    "jir"
+   ],
+   "busiest_hour": 19,
+   "system_events": {},
+   "longest_burst_len": 8
+  },
+  {
+   "date": "2026-11-15",
+   "msgs": 2234,
+   "users_active": 11,
+   "media": 219,
+   "deleted": 5,
+   "empty": 8,
+   "top_tokens": [
+    "jir",
+    "gw",
+    "fp",
+    "main",
+    "ada",
+    "wok"
+   ],
+   "busiest_hour": 21,
+   "system_events": {
+    "other_system": 2,
+    "member_joined": 2,
+    "group_settings": 1,
+    "member_left": 1
+   },
+   "longest_burst_len": 11
+  },
+  {
+   "date": "2026-11-16",
+   "msgs": 1509,
+   "users_active": 8,
+   "media": 181,
+   "deleted": 2,
+   "empty": 2,
+   "top_tokens": [
+    "gw",
+    "wok",
+    "jir",
+    "fp",
+    "arya",
+    "di"
+   ],
+   "busiest_hour": 21,
+   "system_events": {
+    "other_system": 2,
+    "member_removed": 1,
+    "group_settings": 14
+   },
+   "longest_burst_len": 13
+  },
+  {
+   "date": "2026-11-17",
+   "msgs": 1090,
+   "users_active": 10,
+   "media": 165,
+   "deleted": 1,
+   "empty": 10,
+   "top_tokens": [
+    "gw",
+    "wok",
+    "arya",
+    "mau",
+    "jir",
+    "fp"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "group_settings": 15,
+    "other_system": 4,
+    "member_joined": 2,
+    "member_removed": 1
+   },
+   "longest_burst_len": 9
+  },
+  {
+   "date": "2026-11-18",
+   "msgs": 1048,
+   "users_active": 9,
+   "media": 175,
+   "deleted": 17,
+   "empty": 5,
+   "top_tokens": [
+    "gw",
+    "wok",
+    "jir",
+    "aja",
+    "main",
+    "anj"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "other_system": 2
+   },
+   "longest_burst_len": 7
+  },
+  {
+   "date": "2026-11-19",
+   "msgs": 2544,
+   "users_active": 12,
+   "media": 261,
+   "deleted": 4,
+   "empty": 3,
+   "top_tokens": [
+    "gw",
+    "jir",
+    "lu",
+    "wok",
+    "anj",
+    "fp"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "member_added": 1,
+    "group_settings": 10
+   },
+   "longest_burst_len": 14
+  },
+  {
+   "date": "2026-11-20",
+   "msgs": 1398,
+   "users_active": 10,
+   "media": 162,
+   "deleted": 5,
+   "empty": 9,
+   "top_tokens": [
+    "gw",
+    "jir",
+    "mau",
+    "kaga",
+    "anj",
+    "wok"
+   ],
+   "busiest_hour": 20,
+   "system_events": {
+    "group_settings": 5,
+    "other_system": 1
+   },
+   "longest_burst_len": 13
+  },
+  {
+   "date": "2026-11-21",
+   "msgs": 1784,
+   "users_active": 12,
+   "media": 214,
+   "deleted": 7,
+   "empty": 7,
+   "top_tokens": [
+    "gw",
+    "wok",
+    "main",
+    "jir",
+    "fp",
+    "di"
+   ],
+   "busiest_hour": 9,
+   "system_events": {
+    "other_system": 4,
+    "group_settings": 16
+   },
+   "longest_burst_len": 11
+  },
+  {
+   "date": "2026-11-22",
+   "msgs": 1503,
+   "users_active": 12,
+   "media": 105,
+   "deleted": 5,
+   "empty": 2,
+   "top_tokens": [
+    "gw",
+    "wok",
+    "fp",
+    "jir",
+    "iky",
+    "mau"
+   ],
+   "busiest_hour": 19,
+   "system_events": {
+    "member_removed": 1,
+    "group_settings": 5
+   },
+   "longest_burst_len": 14
+  },
+  {
+   "date": "2026-11-23",
+   "msgs": 1345,
+   "users_active": 5,
+   "media": 181,
+   "deleted": 7,
+   "empty": 9,
+   "top_tokens": [
+    "gw",
+    "kaga",
+    "wok",
+    "jir",
+    "arya",
+    "ada"
+   ],
+   "busiest_hour": 8,
+   "system_events": {
+    "group_settings": 7,
+    "member_added": 1
+   },
+   "longest_burst_len": 10
+  }
+ ],
+ "weeks": [
+  {
+   "week_start": "2026-09-28",
+   "msgs": 4629,
+   "users_active": 9,
+   "top_tokens": [
+    "aku",
+    "ada",
+    "aja",
+    "jir",
+    "gw",
+    "gk",
+    "mau",
+    "yg"
+   ]
+  },
+  {
+   "week_start": "2026-10-05",
+   "msgs": 5903,
+   "users_active": 9,
+   "top_tokens": [
+    "gw",
+    "bisa",
+    "gk",
+    "aku",
+    "aja",
+    "jir",
+    "main",
+    "ada"
+   ]
+  },
+  {
+   "week_start": "2026-10-12",
+   "msgs": 10758,
+   "users_active": 10,
+   "top_tokens": [
+    "fp",
+    "gw",
+    "aku",
+    "jir",
+    "aja",
+    "bisa",
+    "main",
+    "gk"
+   ]
+  },
+  {
+   "week_start": "2026-10-19",
+   "msgs": 12782,
+   "users_active": 13,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "main",
+    "aja",
+    "jir",
+    "aku",
+    "di",
+    "mau"
+   ]
+  },
+  {
+   "week_start": "2026-10-26",
+   "msgs": 14308,
+   "users_active": 12,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "main",
+    "jir",
+    "aja",
+    "aku",
+    "mau",
+    "di"
+   ]
+  },
+  {
+   "week_start": "2026-11-02",
+   "msgs": 11920,
+   "users_active": 15,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "main",
+    "jir",
+    "mau",
+    "ga",
+    "aja",
+    "aku"
+   ]
+  },
+  {
+   "week_start": "2026-11-09",
+   "msgs": 6378,
+   "users_active": 12,
+   "top_tokens": [
+    "gw",
+    "fp",
+    "jir",
+    "wok",
+    "biapis",
+    "main",
+    "mau",
+    "ga"
+   ]
+  },
+  {
+   "week_start": "2026-11-16",
+   "msgs": 10876,
+   "users_active": 12,
+   "top_tokens": [
+    "gw",
+    "wok",
+    "jir",
+    "fp",
+    "main",
+    "mau",
+    "anj",
+    "kaga"
+   ]
+  },
+  {
+   "week_start": "2026-11-23",
+   "msgs": 1345,
+   "users_active": 5,
+   "top_tokens": [
+    "gw",
+    "kaga",
+    "wok",
+    "jir",
+    "arya",
+    "ada",
+    "biapis",
+    "anj"
+   ]
+  }
+ ]
+}

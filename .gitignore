@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+__pycache__/
 
 # Build output
 dist/
@@ -12,9 +13,12 @@ coverage/
 !.env.example
 
 # Runtime state
-data/
+data/*
 tmp/
 *.log
+
+# Committed dataset seed artifacts (sanitized; pipeline in scripts/dataset/)
+!data/seed/
 
 # OS / editor
 .DS_Store

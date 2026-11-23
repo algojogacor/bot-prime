@@ -1,0 +1,118 @@
+{
+  "_comment": "Human-curated lore entries for AVOID PRIME | FT. Every citation must be a msg id that exists in data/seed/normalized-messages.jsonl (verified by 05_lore.py). Quotes are taken verbatim from the sanitized archive.",
+  "entries": [
+    {
+      "id": "origin-identity",
+      "title": "Origin and identity",
+      "summary": "AVOID PRIME | FT was created on 2026-09-28 at 17:39 by ~Apip inside the WhatsApp community AVOID CITY, with the squad roster being drafted within the first ten minutes and admin-approval locking turned on the same evening.",
+      "citations": [
+        {"id": "m000002", "note": "~ Apip created group \"AVOID PRIME | FT\""},
+        {"id": "m000003", "note": "added into community AVOID CITY"},
+        {"id": "m000010", "note": "admin approval turned on same day"},
+        {"id": "m000020", "note": "first roster list: 1. AVO|GACOR CB FORD"}
+      ],
+      "tags": ["identity", "system-events"]
+    },
+    {
+      "id": "gb-prime-usage",
+      "title": "GB Prime = Grup Besar Prime (colloquial)",
+      "summary": "\"gb prime\" appears as a colloquial reference to Grup Besar Prime, a related group in the same ecosystem — a tournament focus instruction, a quiet-day complaint, an offhand 'haven't opened it', plus one direct comparison ('prime is livelier than gb'). It is not this group's name and not an unrelated community.",
+      "citations": [
+        {"id": "m014439", "note": "@all yg gb prime di turnamen itu untuk fokus di turnamen yak"},
+        {"id": "m064027", "note": "Sepi kali wok gb prime"},
+        {"id": "m076619", "note": "ga buka gb prime jir"},
+        {"id": "m045519", "note": "tp emg dibandingin prime/gb lebih rame prime (direct comparison)"}
+      ],
+      "tags": ["identity", "reconciliation"]
+    },
+    {
+      "id": "roster-culture",
+      "title": "Roster culture: AVO| prefix and signup templates",
+      "summary": "Squad posts follow a fixed template — 'uid posisi nickname no wa' — and members style themselves AVO|<name> with a position (ST/CB/WF/GK). The convention started in the very first roster message and recurs in every tournament signup.",
+      "citations": [
+        {"id": "m000020", "note": "1. AVO|GACOR CB FORD"},
+        {"id": "m001262", "note": "ARELYNS FLASH PEAK CHAMPIONSHIP — SEASON 3 form"},
+        {"id": "m031416", "note": "AVO|BENNED CB UID : 10021561"}
+      ],
+      "tags": ["roster", "tournament"]
+    },
+    {
+      "id": "matchmaking-ritual",
+      "title": "Matchmaking ritual: lawan siapa / gas lawan X",
+      "summary": "Spar coordination has a fixed call-and-response: someone asks 'lawan siapa' (who's the opponent), someone answers with a rival name and 'gas'. Eclipse, Impact, AGI, Centra and Fision are the recurring sparring partners; 'Avoid League' schedule posts organize the fixtures.",
+      "citations": [
+        {"id": "m000936", "note": "Lawan siapa emg?"},
+        {"id": "m000371", "note": "Gas lawan eclipse"},
+        {"id": "m009949", "note": "mending kita cba lawan impact"},
+        {"id": "m005382", "note": "Jadwal AVOID LEAGUE Hari Match 1"}
+      ],
+      "tags": ["matchmaking", "rivals"]
+    },
+    {
+      "id": "efootball-meta",
+      "title": "eFootball meta-talk: cut turn, long ball, fake shoot",
+      "summary": "Tactical coaching is constant: 'cut turn' before shooting, 'long ball' as the fallback against lag, 'fake shoot' tricks, and goalkeeper blame after every conceded goal ('kiper nya...').",
+      "citations": [
+        {"id": "m004202", "note": "Pernah pakai cut turn gk sebelum shoot?"},
+        {"id": "m003612", "note": "better buang long ball aja ya"},
+        {"id": "m003698", "note": "Kiper nya padahal udah berapa Kali penyelamatan"}
+      ],
+      "tags": ["gaming", "meta"]
+    },
+    {
+      "id": "team-labels",
+      "title": "Member tags with honorifics: YONKOU強, Alfikra神, AMBAKING",
+      "summary": "Core members are tagged with Japanese-styled honorifics (強 = strong, 神 = god) inside mentions like @~YONKOU強 and @~Alfikra神; AMBAKING is both a member tag and a roster position filler.",
+      "citations": [
+        {"id": "m002628", "note": "@Iki FP @~YONKOU強"},
+        {"id": "m001687", "note": "@~YONKOU強 @~Alfikra神"},
+        {"id": "m000501", "note": "Avoid Prime VS ST Alfikra WF AMBAKING CB CB Benned GK"}
+      ],
+      "tags": ["team", "identity"]
+    },
+    {
+      "id": "mandul-banter",
+      "title": "mandul — the signature roast",
+      "summary": "'mandul' (barren) is the standard roast for an inactive team or player, nearly always paired with jir and the 🗿/🤣 reaction. 477 hits over 51 days, aimed at teams, opponents and friends alike.",
+      "citations": [
+        {"id": "m003303", "note": "Ko mandul jir 🗿"},
+        {"id": "m005701", "note": "Fikra mandul jir 🤣"},
+        {"id": "m005215", "note": "Mandul aku Wak 🤧"}
+      ],
+      "tags": ["banter", "signature"]
+    },
+    {
+      "id": "coordination-phrases",
+      "title": "Coordination catch-phrases",
+      "summary": "The group runs on short coordination formulas: 'info mabar', 'info rank', 'p info main lah', 'yg main?', 'main kah', 'ayo mabar', 'jam brp/berapa' — always lowercase, always one line.",
+      "citations": [
+        {"id": "m000030", "note": "p info main lah abis ini"},
+        {"id": "m002518", "note": "info rank lah @all"},
+        {"id": "m000666", "note": "Yg main?"},
+        {"id": "m000450", "note": "ayo mabar rank full tim klo bisa"}
+      ],
+      "tags": ["rhythm", "coordination"]
+    },
+    {
+      "id": "tiktok-sharing",
+      "title": "TikTok clip sharing as social currency",
+      "summary": "vt.tiktok.com links are shared across 32 different days (69 occurrences), usually game highlights — the group's way of showing off and roasting each other's gameplay.",
+      "citations": [
+        {"id": "m006475", "note": "roster post containing vt tiktok link"}
+      ],
+      "tags": ["media", "culture"]
+    },
+    {
+      "id": "bot-arrival",
+      "title": "Omak joins the group (2026-11-23)",
+      "summary": "On the archive's final day the bot was added ('You added bot new'), greeted with 'selamat datang member baru', welcomed by Biapis FP with 'Wih ada bot disinih', and immediately tested with '!myid'.",
+      "citations": [
+        {"id": "m079084", "note": "system: You added bot new"},
+        {"id": "m079086", "note": "selamat datang member baru"},
+        {"id": "m079087", "note": "Wih ada bot disinih"},
+        {"id": "m079090", "note": "!myid"}
+      ],
+      "tags": ["bot", "identity"]
+    }
+  ]
+}

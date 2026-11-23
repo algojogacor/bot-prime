@@ -1,0 +1,24 @@
+{
+ "source_file": "WhatsApp Chat with AVOID PRIME  FT.txt",
+ "source_sha256": "262ae7acb1ccc09307bff54e7ae74e62b4b80272a231eaff3cae8fd521e483bd",
+ "source_bytes": 3866417,
+ "assumed_timezone": "WIB (UTC+7) — timestamps exported as local device time; no offset in file",
+ "parser_version": "1.0.0",
+ "parse": {
+  "records": 79090,
+  "user": 78899,
+  "system": 191,
+  "text": 71302,
+  "media": 7024,
+  "deleted": 324,
+  "empty": 249,
+  "multiline": 445,
+  "duplicates": 1416,
+  "tokens_total": 227604
+ },
+ "total_lines": 83305,
+ "blank_lines": 799,
+ "diagnostics": [],
+ "diagnostics_count": 0,
+ "days_active": 57
+}

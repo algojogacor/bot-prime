@@ -1,19 +1,20 @@
 # Language Profile — AVOID PRIME | FT
 
-Derived from the statistical analysis of the community's own chat archive
-(79,090 messages, 25 participants, 2026-09-28 → 2026-11-23; methodology and full
-numbers in `docs/research/research-findings.md`). Private identifiers are excluded
+Derived from the reproducible reprocessing of the community's own chat archive
+(79,090 records, 25 participants, 2026-09-28 → 2026-11-23) by `scripts/dataset/`
+(canonical detailed version: `docs/personality/community-language-profile.md`;
+audit: `docs/audit/community-dataset-audit.md`). Private identifiers are excluded
 here by design.
 
 ## Corpus shape
 
 | Signal | Value | Design consequence |
 | --- | --- | --- |
-| Median length | 12 chars / 2 tokens | replies must be tiny |
-| ≤3 tokens per message | 68.2% | one-line style |
-| All-lowercase | 34.8% | lowercase is the neutral register |
+| Message length p50 | 11 chars / 2 tokens | replies must be tiny |
+| ≤3 tokens per message | 68.1% | one-line style |
+| All-lowercase | 36.0% | lowercase is the neutral register |
 | Emoji in message | 2.6% | emoji are accents, not punctuation |
-| Bursts of 1–2 messages | 84.7% | 2.5 s burst window fits the rhythm |
+| Bursts of 1–2 messages | 85.0% | 2.5 s burst window fits the rhythm |
 | Peak hours | 19:00–21:00 WIB (20:00 max) | starters live in 18–22 WIB |
 | Quiet 23:00–07:00 | 5.5% of traffic | dead hours get zero proactive pings |
 | Top-10 share | 94.8% | cooldowns keep the bot out of the way |
@@ -26,8 +27,8 @@ here by design.
 - Interjections: jir 2,582, wok 1,641, yak 551, sih 333, dong 211, deh 171.
 - Agreement: ya/iya, ok/oke, **bet 324**, siap 200, yoi 15.
 - Intensity: bgt 173, parah 83.
-- Laughter: **wkwk-family 1,570** (vs haha 9, lol 7).
-- Signature emoji: 🗿 839 (55% of all emoji), then 😭 151, 😹 142, 🤣 137, 😈 103.
+- Laughter: **wkwk-family 1,598** (vs haha 5, lol 7).
+- Signature emoji: 🗿 839 (33% of all emoji), then 😭 151, 😹 141, 🤣 137, 😈 103.
 
 ## Vocabulary notes
 
@@ -41,8 +42,9 @@ here by design.
 
 ## English code-mixing (calibration)
 
-Only 2.0% of messages contain any English token (0.9% unambiguous), and the top
-English tokens are gaming words (match 248, bro 214, no 213, game 194, sorry 148).
+Only 3.0% of messages contain any token from the broad English list (1.8% strict
+gaming-only), and the top English tokens are gaming words (match 248, bro 214, no 213,
+game 194, sorry 148).
 The published Indonesian sociolinguistics studies describe TikTok/Instagram Gen Z at
 68–82% mixing rates — **this community is not that**. The bot therefore:
 
@@ -53,13 +55,15 @@ The published Indonesian sociolinguistics studies describe TikTok/Instagram Gen 
 
 ## Profanity and edge
 
-- 7.9% of messages contain profanity tokens (80.5 per 1k) — rough banter is the
-  group's baseline, and the bot may match the tone while never escalating into
-  targeted abuse (see personality.md truth boundary + rage-bait limiter).
+- 2.1% of messages contain profanity tokens from the documented 29-term list (22.1 per
+  1k text messages; the earlier ad-hoc pass reported 7.9% with a broader unrecorded
+  list) — rough banter is the group's baseline either way, and the bot may match the
+  tone while never escalating into targeted abuse (see personality.md truth boundary +
+  rage-bait limiter).
 
 ## Drift
 
-Top-80 token Jaccard between the archive's first and last third: **0.569** — stable
+Top-80 token Jaccard between the archive's first and last third: **0.553** — stable
 core, evolving slang. Re-derive this profile from fresh exports periodically
-(e.g. monthly) instead of treating it as fixed; the numbers above describe
-Sep–Nov 2026.
+(e.g. monthly) with `scripts/dataset/run_all.sh` instead of treating it as fixed; the
+numbers above describe Sep–Nov 2026.

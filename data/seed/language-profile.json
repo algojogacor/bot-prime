@@ -1,0 +1,118 @@
+{
+ "community": "AVOID PRIME | FT",
+ "generated_from": "data/seed/statistics.json",
+ "register": {
+  "first_person": {
+   "gw": 4583,
+   "aku": 2119,
+   "saya": 57
+  },
+  "second_person": {
+   "lu": 993,
+   "kamu": 145
+  },
+  "negation": {
+   "ga": 1609,
+   "gk": 1277,
+   "kaga": 534,
+   "gak": 519
+  },
+  "interjections": {
+   "jir": 2598,
+   "wok": 1647,
+   "yak": 607,
+   "sih": 332,
+   "dong": 211,
+   "deh": 171
+  },
+  "agreement": {
+   "bet": 322,
+   "siap": 185,
+   "yoi": 15,
+   "ok": 568,
+   "oke": 426
+  }
+ },
+ "laughter": {
+  "wkwk_family": 1598,
+  "haha_family": 5,
+  "lol": 7
+ },
+ "emoji_top": [
+  [
+   "🗿",
+   839
+  ],
+  [
+   "😭",
+   151
+  ],
+  [
+   "😹",
+   141
+  ],
+  [
+   "🤣",
+   137
+  ],
+  [
+   "😈",
+   103
+  ],
+  [
+   "😂",
+   81
+  ],
+  [
+   "🤭",
+   70
+  ],
+  [
+   "🥀",
+   64
+  ],
+  [
+   "😋",
+   49
+  ],
+  [
+   "🥰",
+   47
+  ]
+ ],
+ "signature_terms": {
+  "mandul": 462,
+  "gas": 831,
+  "spar": 1012,
+  "kiper": 818,
+  "yonkou強": 910,
+  "ambaking": 476,
+  "fp": 2680
+ },
+ "english_mixing": {
+  "any_pct": 3.0,
+  "strict_pct": 1.8
+ },
+ "rhythm": {
+  "chars_p50": 11,
+  "pct_up_to_3_tokens": 68.1,
+  "burst_1_2_pct": 85.0,
+  "peak_hours": [
+   [
+    "20",
+    14758
+   ],
+   [
+    "21",
+    10185
+   ],
+   [
+    "19",
+    10133
+   ]
+  ],
+  "quiet_23_07_pct": 5.5
+ },
+ "profanity_msgs_pct": 2.1,
+ "drift_jaccard": 0.553
+}

@@ -1,0 +1,11 @@
+{
+ "dataset": "AVOID PRIME | FT — normalized WhatsApp export",
+ "community": "AVOID PRIME | FT (group) inside WhatsApp community AVOID CITY",
+ "source_archive": "WhatsApp Chat with AVOID PRIME  FT.txt",
+ "source_sha256": "262ae7acb1ccc09307bff54e7ae74e62b4b80272a231eaff3cae8fd521e483bd",
+ "source_bytes": 3866417,
+ "parser_version": "1.0.0",
+ "assumed_timezone": "WIB (UTC+7) — timestamps exported as local device time; no offset in file",
+ "sanitization": "sender pseudonyms; phone numbers masked as [no-diredam]; display aliases kept; raw numbers only in private workspace",
+ "pipeline": "scripts/dataset (see scripts/dataset/README.md)"
+}

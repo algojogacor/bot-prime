@@ -1,0 +1,1136 @@
+{
+ "identity": {
+  "archive_file": "WhatsApp Chat with AVOID PRIME  FT.txt",
+  "group_created_line": "~ Apip created group \"AVOID PRIME | FT\"",
+  "community_line": "[number] added you to a group in the community: AVOID CITY",
+  "subject_changes": 0,
+  "mentions_gb_prime": 3,
+  "gb_prime_status": "colloquial reference to Grup Besar Prime within the same AVOID CITY community — NOT a foreign community",
+  "mentions_avoid": 1034,
+  "mentions_fp_token": 2680
+ },
+ "totals": {
+  "messages_parsed": 79090,
+  "user_messages": 78899,
+  "system_messages": 191,
+  "text_messages": 71302,
+  "media_messages": 7024,
+  "empty_messages": 249,
+  "deleted_placeholders": 324,
+  "participants": 25,
+  "first_ts": "2026-09-28T17:41:00",
+  "last_ts": "2026-11-23T14:27:00",
+  "days_active": 57,
+  "messages_per_active_day": 1384.2,
+  "duplicate_consecutive": 1416
+ },
+ "participation": {
+  "top1_share_pct": 27.6,
+  "top5_share_pct": 79.5,
+  "top10_share_pct": 94.8,
+  "contribution_buckets": {
+   "1": 0,
+   "2_to_9": 1,
+   "10_to_99": 6,
+   "100_to_999": 8,
+   "1000_plus": 10
+  }
+ },
+ "time": {
+  "hour_histogram": {
+   "00": 671,
+   "01": 98,
+   "02": 5,
+   "03": 37,
+   "04": 133,
+   "05": 227,
+   "06": 1393,
+   "07": 2217,
+   "08": 2819,
+   "09": 2548,
+   "10": 2000,
+   "11": 1788,
+   "12": 1932,
+   "13": 2216,
+   "14": 3469,
+   "15": 4003,
+   "16": 2934,
+   "17": 3317,
+   "18": 5741,
+   "19": 10133,
+   "20": 14758,
+   "21": 10185,
+   "22": 4487,
+   "23": 1788
+  },
+  "weekday": {
+   "Mon": 10613,
+   "Tue": 8949,
+   "Wed": 12336,
+   "Thu": 11919,
+   "Fri": 9494,
+   "Sat": 10025,
+   "Sun": 15563
+  },
+  "month": {
+   "2026-09": 341,
+   "2026-10": 44407,
+   "2026-11": 34151
+  },
+  "quiet_23_to_07_pct": 5.5
+ },
+ "bursts": {
+  "count": 47571,
+  "length_distribution_pct": {
+   "1": 62.9,
+   "2": 22.1,
+   "3": 8.3,
+   "4": 3.5,
+   "5": 1.7,
+   "6": 1.5
+  },
+  "median_gap_seconds_within_burst": 0.0,
+  "p90_gap_seconds_within_burst": 60.0
+ },
+ "length": {
+  "chars_p10_p50_p90": [
+   4,
+   11,
+   30
+  ],
+  "tokens_p10_p50_p90": [
+   1,
+   2,
+   6
+  ],
+  "pct_up_to_3_tokens": 68.1,
+  "pct_15_plus_tokens": 0.5,
+  "pct_all_lowercase": 36.0,
+  "pct_all_uppercase": 1.2,
+  "pct_has_question_mark": 5.2
+ },
+ "formatting": {
+  "pct_with_emoji": 2.6,
+  "pct_has_mention": 8.0,
+  "pct_with_link": 0.1
+ },
+ "media": {
+  "msgs": 7024,
+  "types": {
+   "image": 7024
+  },
+  "with_caption": 5
+ },
+ "top_tokens": [
+  [
+   "gw",
+   4777
+  ],
+  [
+   "fp",
+   2887
+  ],
+  [
+   "jir",
+   2582
+  ],
+  [
+   "main",
+   2377
+  ],
+  [
+   "aja",
+   2215
+  ],
+  [
+   "aku",
+   2136
+  ],
+  [
+   "mau",
+   1958
+  ],
+  [
+   "di",
+   1826
+  ],
+  [
+   "yg",
+   1823
+  ],
+  [
+   "bisa",
+   1793
+  ],
+  [
+   "ada",
+   1712
+  ],
+  [
+   "ga",
+   1642
+  ],
+  [
+   "wok",
+   1641
+  ],
+  [
+   "ini",
+   1594
+  ],
+  [
+   "nya",
+   1465
+  ],
+  [
+   "itu",
+   1361
+  ],
+  [
+   "ya",
+   1344
+  ],
+  [
+   "gk",
+   1327
+  ],
+  [
+   "lagi",
+   1244
+  ],
+  [
+   "biapis",
+   1217
+  ],
+  [
+   "klo",
+   1209
+  ],
+  [
+   "all",
+   1156
+  ],
+  [
+   "udh",
+   1151
+  ],
+  [
+   "lawan",
+   1120
+  ],
+  [
+   "arya",
+   1049
+  ],
+  [
+   "lah",
+   1043
+  ],
+  [
+   "spar",
+   1024
+  ],
+  [
+   "lu",
+   1023
+  ],
+  [
+   "jam",
+   1015
+  ],
+  [
+   "kita",
+   964
+  ],
+  [
+   "anj",
+   957
+  ],
+  [
+   "apa",
+   931
+  ],
+  [
+   "st",
+   914
+  ],
+  [
+   "yonkou強",
+   913
+  ],
+  [
+   "dia",
+   886
+  ],
+  [
+   "1",
+   872
+  ],
+  [
+   "wkwk",
+   866
+  ],
+  [
+   "kan",
+   839
+  ],
+  [
+   "iya",
+   833
+  ],
+  [
+   "kiper",
+   830
+  ],
+  [
+   "eren",
+   828
+  ],
+  [
+   "benned",
+   818
+  ],
+  [
+   "sama",
+   805
+  ],
+  [
+   "gas",
+   803
+  ],
+  [
+   "kah",
+   782
+  ],
+  [
+   "iky",
+   778
+  ],
+  [
+   "2",
+   777
+  ],
+  [
+   "tur",
+   757
+  ],
+  [
+   "mana",
+   753
+  ],
+  [
+   "siapa",
+   735
+  ],
+  [
+   "ke",
+   735
+  ],
+  [
+   "tim",
+   719
+  ],
+  [
+   "juga",
+   716
+  ],
+  [
+   "nnti",
+   701
+  ],
+  [
+   "iki",
+   694
+  ],
+  [
+   "cb",
+   678
+  ],
+  [
+   "udah",
+   678
+  ],
+  [
+   "avo",
+   653
+  ],
+  [
+   "this",
+   652
+  ],
+  [
+   "message",
+   646
+  ]
+ ],
+ "short_tokens_top": [
+  [
+   "gw",
+   4777
+  ],
+  [
+   "fp",
+   2887
+  ],
+  [
+   "jir",
+   2582
+  ],
+  [
+   "main",
+   2377
+  ],
+  [
+   "aja",
+   2215
+  ],
+  [
+   "aku",
+   2136
+  ],
+  [
+   "mau",
+   1958
+  ],
+  [
+   "di",
+   1826
+  ],
+  [
+   "yg",
+   1823
+  ],
+  [
+   "bisa",
+   1793
+  ],
+  [
+   "ada",
+   1712
+  ],
+  [
+   "ga",
+   1642
+  ],
+  [
+   "wok",
+   1641
+  ],
+  [
+   "ini",
+   1594
+  ],
+  [
+   "nya",
+   1465
+  ],
+  [
+   "itu",
+   1361
+  ],
+  [
+   "ya",
+   1344
+  ],
+  [
+   "gk",
+   1327
+  ],
+  [
+   "lagi",
+   1244
+  ],
+  [
+   "klo",
+   1209
+  ],
+  [
+   "all",
+   1156
+  ],
+  [
+   "udh",
+   1151
+  ],
+  [
+   "arya",
+   1049
+  ],
+  [
+   "lah",
+   1043
+  ],
+  [
+   "spar",
+   1024
+  ],
+  [
+   "lu",
+   1023
+  ],
+  [
+   "jam",
+   1015
+  ],
+  [
+   "kita",
+   964
+  ],
+  [
+   "anj",
+   957
+  ],
+  [
+   "apa",
+   931
+  ],
+  [
+   "st",
+   914
+  ],
+  [
+   "dia",
+   886
+  ],
+  [
+   "1",
+   872
+  ],
+  [
+   "wkwk",
+   866
+  ],
+  [
+   "kan",
+   839
+  ],
+  [
+   "iya",
+   833
+  ],
+  [
+   "eren",
+   828
+  ],
+  [
+   "sama",
+   805
+  ],
+  [
+   "gas",
+   803
+  ],
+  [
+   "kah",
+   782
+  ]
+ ],
+ "vowel_less_tokens_top": [
+  [
+   "wkwkwk",
+   571
+  ],
+  [
+   "wkwkw",
+   378
+  ],
+  [
+   "wkwkkw",
+   153
+  ],
+  [
+   "https",
+   125
+  ],
+  [
+   "wkwkwkw",
+   67
+  ],
+  [
+   "wkkwkw",
+   65
+  ],
+  [
+   "wkwkwkwk",
+   59
+  ],
+  [
+   "12706968",
+   42
+  ]
+ ],
+ "top_bigrams": [
+  [
+   "biapis fp",
+   644
+  ],
+  [
+   "iki fp",
+   507
+  ],
+  [
+   "benned fp",
+   502
+  ],
+  [
+   "iky fp",
+   488
+  ],
+  [
+   "eren fariz",
+   393
+  ],
+  [
+   "fariz fp",
+   393
+  ],
+  [
+   "this message",
+   321
+  ],
+  [
+   "message was",
+   321
+  ],
+  [
+   "was edited",
+   321
+  ],
+  [
+   "bunny fp",
+   254
+  ],
+  [
+   "gw mau",
+   198
+  ],
+  [
+   "ada yg",
+   162
+  ],
+  [
+   "jam 8",
+   149
+  ],
+  [
+   "no diredam",
+   141
+  ],
+  [
+   "gk bisa",
+   137
+  ],
+  [
+   "jam 7",
+   123
+  ],
+  [
+   "mau main",
+   117
+  ],
+  [
+   "bisa main",
+   112
+  ],
+  [
+   "jam 20",
+   112
+  ],
+  [
+   "avoid prime",
+   106
+  ],
+  [
+   "siapa aja",
+   104
+  ],
+  [
+   "jam 9",
+   98
+  ],
+  [
+   "gw main",
+   97
+  ],
+  [
+   "hari ini",
+   92
+  ],
+  [
+   "mau spar",
+   91
+  ],
+  [
+   "nickname uid",
+   91
+  ],
+  [
+   "loh ya",
+   91
+  ],
+  [
+   "yg main",
+   90
+  ],
+  [
+   "oh ya",
+   90
+  ],
+  [
+   "no wa",
+   87
+  ],
+  [
+   "gw juga",
+   85
+  ],
+  [
+   "lawan siapa",
+   84
+  ],
+  [
+   "nama lengkap",
+   84
+  ],
+  [
+   "yg mau",
+   80
+  ],
+  [
+   "tiktok com",
+   77
+  ],
+  [
+   "gw udh",
+   75
+  ],
+  [
+   "lawan eclipse",
+   73
+  ],
+  [
+   "jam brp",
+   73
+  ],
+  [
+   "jam berapa",
+   73
+  ],
+  [
+   "gw aja",
+   73
+  ]
+ ],
+ "top_trigrams": [
+  [
+   "eren fariz fp",
+   393
+  ],
+  [
+   "this message was",
+   321
+  ],
+  [
+   "message was edited",
+   321
+  ],
+  [
+   "https vt tiktok",
+   69
+  ],
+  [
+   "vt tiktok com",
+   69
+  ],
+  [
+   "posisi nickname uid",
+   42
+  ],
+  [
+   "nama lengkap no",
+   42
+  ],
+  [
+   "lengkap no wa",
+   42
+  ],
+  [
+   "no wa nickname",
+   42
+  ],
+  [
+   "wa nickname uid",
+   42
+  ],
+  [
+   "wa no diredam",
+   42
+  ],
+  [
+   "no wa no",
+   38
+  ],
+  [
+   "no diredam nickname",
+   38
+  ],
+  [
+   "diredam nickname avo",
+   38
+  ],
+  [
+   "arya iki fp",
+   36
+  ],
+  [
+   "fp iki fp",
+   34
+  ],
+  [
+   "avo benned cb",
+   31
+  ],
+  [
+   "jam 20 00",
+   31
+  ],
+  [
+   "ada yg mau",
+   30
+  ],
+  [
+   "siapa aja yg",
+   30
+  ],
+  [
+   "avo lemonz cb",
+   30
+  ],
+  [
+   "arya biapis fp",
+   29
+  ],
+  [
+   "fp biapis fp",
+   29
+  ],
+  [
+   "fp eren fariz",
+   29
+  ],
+  [
+   "20 00 wib",
+   26
+  ],
+  [
+   "yonkou強 alfikra神 arya",
+   26
+  ],
+  [
+   "biapis fp iki",
+   26
+  ],
+  [
+   "fp iky fp",
+   26
+  ],
+  [
+   "hp no diredam",
+   26
+  ],
+  [
+   "1 avo benned",
+   24
+  ]
+ ],
+ "term_counts": {
+  "gw": 4583,
+  "aku": 2119,
+  "ak": 575,
+  "gua": 184,
+  "gue": 98,
+  "saya": 57,
+  "lu": 993,
+  "kamu": 145,
+  "km": 45,
+  "elu": 38,
+  "kita": 932,
+  "cok": 500,
+  "bang": 327,
+  "bro": 209,
+  "bg": 89,
+  "mas": 86,
+  "temen": 82,
+  "guys": 62,
+  "cuy": 59,
+  "coy": 13,
+  "bestie": 6,
+  "ga": 1609,
+  "gk": 1277,
+  "kaga": 534,
+  "gak": 519,
+  "engga": 48,
+  "nggak": 18,
+  "jir": 2598,
+  "kan": 832,
+  "si": 545,
+  "cik": 361,
+  "sih": 332,
+  "mah": 217,
+  "dong": 211,
+  "loh": 192,
+  "deh": 171,
+  "yak": 607,
+  "wok": 1647,
+  "weh": 19,
+  "euy": 10,
+  "ya": 1327,
+  "iya": 830,
+  "ok": 568,
+  "oke": 426,
+  "y": 336,
+  "bet": 322,
+  "nah": 226,
+  "siap": 185,
+  "iyh": 159,
+  "bener": 160,
+  "yoi": 15,
+  "mantap": 15,
+  "sip": 29,
+  "bgt": 173,
+  "parah": 83,
+  "banget": 59,
+  "amat": 41,
+  "mandul": 462,
+  "gas": 831,
+  "spar": 1012,
+  "kiper": 818,
+  "rank": 377,
+  "uid": 49,
+  "mabar": 228,
+  "turnamen": 55,
+  "lawan": 1087,
+  "login": 499,
+  "tim": 645,
+  "avoid": 194,
+  "prime": 453,
+  "eclipse": 373,
+  "agi": 209,
+  "impact": 251,
+  "centra": 129,
+  "fision": 114,
+  "yonkou強": 910,
+  "ambaking": 476,
+  "fp": 2680,
+  "avo": 387,
+  "gb prime": 3,
+  "cut turn": 54,
+  "lawan eclipse": 73,
+  "lawan siapa": 86,
+  "no wa": 19,
+  "uid posisi": 0
+ },
+ "laughter": {
+  "wkwk_family_msgs": 1598,
+  "awok_msgs": 2,
+  "haha_family_msgs": 5,
+  "lol_lmao_msgs": 7
+ },
+ "profanity": {
+  "total_tokens": 1579,
+  "msgs_pct": 2.1,
+  "per_1k_text_messages": 22.1,
+  "substring_variant_tokens": 2715,
+  "list_terms": 29
+ },
+ "english_switch": {
+  "any_pct": 3.0,
+  "strict_pct": 1.8,
+  "broad_list": [
+   "match",
+   "bro",
+   "no",
+   "game",
+   "sorry",
+   "team",
+   "win",
+   "guys",
+   "wait",
+   "the",
+   "nice",
+   "play",
+   "gg",
+   "good",
+   "luck",
+   "ready",
+   "yes",
+   "best",
+   "ok",
+   "well"
+  ],
+  "strict_list": [
+   "match",
+   "game",
+   "sorry",
+   "team",
+   "win",
+   "wait",
+   "the",
+   "nice",
+   "play",
+   "gg",
+   "ready",
+   "guys"
+  ]
+ },
+ "emoji": {
+  "total": 2547,
+  "distinct": 180,
+  "msgs_with_emoji": 1874,
+  "top": [
+   [
+    "🗿",
+    839
+   ],
+   [
+    "😭",
+    151
+   ],
+   [
+    "😹",
+    141
+   ],
+   [
+    "🤣",
+    137
+   ],
+   [
+    "😈",
+    103
+   ],
+   [
+    "😂",
+    81
+   ],
+   [
+    "🤭",
+    70
+   ],
+   [
+    "🥀",
+    64
+   ],
+   [
+    "😋",
+    49
+   ],
+   [
+    "🥰",
+    47
+   ],
+   [
+    "🆚",
+    46
+   ],
+   [
+    "🥲",
+    41
+   ],
+   [
+    "🔥",
+    38
+   ],
+   [
+    "🙏",
+    35
+   ],
+   [
+    "😘",
+    33
+   ],
+   [
+    "🏆",
+    31
+   ],
+   [
+    "😞",
+    25
+   ],
+   [
+    "🧢",
+    24
+   ],
+   [
+    "🥹",
+    18
+   ],
+   [
+    "👿",
+    18
+   ],
+   [
+    "🤫",
+    17
+   ],
+   [
+    "🤬",
+    16
+   ],
+   [
+    "😑",
+    15
+   ],
+   [
+    "⚽",
+    15
+   ],
+   [
+    "😔",
+    15
+   ],
+   [
+    "🎮",
+    14
+   ],
+   [
+    "👑",
+    14
+   ],
+   [
+    "😇",
+    14
+   ],
+   [
+    "🤧",
+    13
+   ],
+   [
+    "😎",
+    13
+   ]
+  ]
+ },
+ "drift": {
+  "jaccard_top80_first_third_vs_last_third": 0.553
+ },
+ "system_events": {
+  "encryption_notice": 1,
+  "group_created": 1,
+  "community_notice": 1,
+  "member_joined": 17,
+  "admin_approval": 1,
+  "group_settings": 102,
+  "member_added": 13,
+  "member_removed": 13,
+  "other_system": 39,
+  "member_left": 3
+ },
+ "methodology": {
+  "tokenizer": "lowercase word tokens (unicode \\w) on text_normalized",
+  "term_counts": "word-boundary regex per term, case-insensitive, message-level",
+  "bursts": "same-sender consecutive user messages, gap <= 60 s",
+  "drift": "top-80 token set Jaccard, corpus thirds by message order",
+  "emoji": "Unicode emoji-range chars, FE0F/ZWJ excluded",
+  "timestamp_tz": "as exported, assumed WIB (UTC+7)"
+ }
+}
