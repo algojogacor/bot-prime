@@ -32,6 +32,14 @@ const envSchema = z.object({
   // Quiet hours in UTC, "start-end"; 16-0 == 23:00-07:00 WIB.
   OMAK_QUIET_HOURS_UTC: z.string().regex(/^\d{1,2}-\d{1,2}$/).default('16-0'),
   OMAK_MAX_DAILY_AI_CALLS: z.coerce.number().int().min(0).default(300),
+
+  // Social pacing.
+  OMAK_AMBIENT_REPLY_RATE: z.coerce.number().min(0).max(1).default(0.04),
+  OMAK_MAX_REPLIES_PER_HOUR: z.coerce.number().int().min(1).default(12),
+  OMAK_MIN_REPLY_GAP_MS: z.coerce.number().int().min(0).default(8_000),
+  OMAK_MAX_STARTERS_PER_DAY: z.coerce.number().int().min(0).default(2),
+  // Bot nicknames the group can call it by (comma-separated, lowercase).
+  OMAK_MENTION_TOKENS: z.string().default('omak,oma,mak'),
 });
 
 export type Env = z.infer<typeof envSchema>;
