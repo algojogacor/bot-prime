@@ -78,6 +78,7 @@ export class WhatsAppService {
   private reconnectDelayMs = 2_000;
   private pairingRequested = false;
   private readonly deduper = new MessageDeduper();
+  private readonly rawRecent = new Map<string, WAMessage[]>();
   private readonly collector: BurstCollector<NormalizedMessage>;
 
   constructor(private readonly opts: WhatsAppServiceOptions) {
@@ -126,6 +127,19 @@ export class WhatsAppService {
     }
     await sock.sendMessage(jid, { text });
     log.info({ jid, length: text.length }, 'text sent');
+  }
+
+  /** Send a sticker (WEBP bytes). */
+  async sendSticker(jid: string, sticker: Buffer): Promise<void> {
+    const sock = this.sock;
+    if (!sock || this.status !== 'connected') throw new Error('WhatsApp not connected');
+    await sock.sendMessage(jid, { sticker });
+    log.info({ jid, size: sticker.length }, 'sticker sent');
+  }
+
+  /** Last raw messages per chat — used by admin commands (sticker intake). */
+  recentRaw(chatJid: string, n = 10): WAMessage[] {
+    return (this.rawRecent.get(chatJid) ?? []).slice(-n);
   }
 
   private async connect(): Promise<void> {
@@ -235,6 +249,7 @@ export class WhatsAppService {
       const norm = normalizeMessage(waMsg);
       if (!norm || norm.type === 'protocolMessage') continue;
       if (this.deduper.check(norm.id)) continue;
+      this.storeRaw(norm.chatJid, waMsg);
       batch.push(norm);
     }
     if (batch.length === 0) return;
@@ -255,5 +270,12 @@ export class WhatsAppService {
     for (const m of batch) {
       this.collector.push(m.chatJid, m);
     }
+  }
+
+  private storeRaw(chatJid: string, msg: WAMessage): void {
+    const ring = this.rawRecent.get(chatJid) ?? [];
+    ring.push(msg);
+    if (ring.length > 10) ring.splice(0, ring.length - 10);
+    this.rawRecent.set(chatJid, ring);
   }
 }

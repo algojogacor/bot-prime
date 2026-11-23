@@ -17,6 +17,8 @@ import { RageBaitLimiter, isRageBaitRequest, RAGE_BAIT_DEFLECTIONS } from './rag
 import { localRoast, ROAST_GUIDELINES } from './roast.js';
 import { hasUnverifiableClaim, TRUTH_FALLBACK } from './personality.js';
 import type { NormalizedMessage } from '../whatsapp/normalize.js';
+import type { WAMessage } from '@whiskeysockets/baileys';
+import type { CommandRegistry } from '../commands/registry.js';
 
 const log = childLogger({ mod: 'social' });
 
@@ -31,6 +33,9 @@ export type OrchestratorDeps = {
   /** Cheap, non-AI sticker match by text; returns a sticker name or null. */
   matchSticker?: (text: string) => Promise<string | null>;
   sendStickerByName?: (chatJid: string, name: string) => Promise<void>;
+  /** Group commands (handled before any participation logic). */
+  commands?: CommandRegistry;
+  getRecentRaw?: (chatJid: string, n?: number) => WAMessage[];
 };
 
 function displayName(m: NormalizedMessage): string {
@@ -72,6 +77,19 @@ export class SocialOrchestrator {
 
     const lastText = last.text ?? '';
     if (!lastText) return;
+
+    // Commands bypass every social gate (admins must always reach the bot).
+    if (lastText.startsWith('!') && this.deps.commands) {
+      await this.deps.commands.handle(lastText, {
+        chatJid,
+        senderJid: last.senderJid,
+        senderName: displayName(last),
+        isAdmin: this.isSenderAdmin(last),
+        recentRaw: () => this.deps.getRecentRaw?.(chatJid, 10) ?? [],
+        reply: (text) => this.deps.sender.sendText(chatJid, text),
+      });
+      return;
+    }
 
     // Rage-bait: register escalating demands before anything else.
     if (isRageBaitRequest(lastText)) {
@@ -168,8 +186,7 @@ export class SocialOrchestrator {
     }
   }
 
-  private async extractMemories(chatJid: string, burst: NormalizedMessage[]): Promise<void> {
-    const extracted = heuristicExtract(
+  private async extractMemories(chatJid: string, burst: NormalizedMessage[]): Promise<void> {    const extracted = heuristicExtract(
       burst.map((m) => m.text ?? '').filter((t) => t.length > 0),
     );
     for (const m of extracted) {
@@ -203,5 +220,24 @@ export class SocialOrchestrator {
   private async send(chatJid: string, text: string): Promise<void> {
     await this.deps.sender.sendText(chatJid, text);
     this.noteReply(chatJid);
+  }
+
+  /**
+   * Admin match by exact JID or by the last 9 digits of the phone number
+   * (admins may be configured with either the PN or the LID form).
+   */
+  private isSenderAdmin(m: NormalizedMessage): boolean {
+    const admins = parseList(env.OMAK_ADMIN_JIDS);
+    if (admins.length === 0) return false;
+    const senderForms = [m.senderJid, m.senderJidAlt ?? ''];
+    const senderDigits = senderForms.map((j) => j.replace(/\D/g, ''));
+    return admins.some((admin) => {
+      const adminDigits = admin.replace(/\D/g, '');
+      return (
+        senderForms.includes(admin) ||
+        (adminDigits.length >= 8 &&
+          senderDigits.some((d) => d.endsWith(adminDigits.slice(-9))))
+      );
+    });
   }
 }
