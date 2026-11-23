@@ -37,16 +37,18 @@ tokenizer, term counting, burst window (same sender, ≤ 60 s, non-deleted), dri
 
 ## Privacy model
 
-- **Committed here**: sender pseudonym keys (`p-…`), display-name aliases
+- **`data/seed/` (derived)**: sender pseudonym keys (`p-…`), display-name aliases
   participants chose in the group, phone-number sender aliases fully masked
   (`+CC ••••••••XX`), and message text with any phone number replaced by
   `[no-diredam]`.
-- **Never committed**: the raw export, and the private map
-  (`raw sender → key → alias`, written to the workspace only, e.g.
-  `/home/z/my-project/.work/dataset-private/participants-map.json`). Re-run stage 2
-  with `--work` to regenerate it locally if needed.
-- Stage 7 re-scans every artifact for phone patterns, the private numbers, and
-  credential patterns — the committed quality report must show 0 hits.
+- **`data/source/` (originals)**: published by explicit owner authorization
+  (2026-11-23, members' consent confirmed) — raw export, ZIP copy, VCF cards,
+  and the raw→key alias map (`participants-map.json`). Stage 2's `--work` output
+  mirrors `data/source/participants-map.json`.
+- Stage 7 re-scans every derived artifact for phone patterns, the raw numbers, and
+  credential patterns — the committed quality report must show 0 hits for
+  `data/seed/`. Credential boundaries (API keys, PATs, session state) stay out of
+  the repository entirely.
 
 ## Parser notes (extraction decisions)
 

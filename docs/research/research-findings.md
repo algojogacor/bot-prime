@@ -2,7 +2,7 @@
 
 Date: 2026-11-23
 Scope: community language profile, Gen Z sociolinguistics, humor/persona design, and the three platform pillars (Baileys v7, Turso, Koyeb) that the implementation depends on.
-This document contains only aggregate and public information. Private participant identifiers (names, phone numbers, JIDs) were deliberately excluded; raw archive artifacts stay outside this repository.
+This document contains only aggregate and public information. Private participant identifiers (names, phone numbers, JIDs) were excluded at analysis time; the original source materials are published under `data/source/` by explicit owner authorization (2026-11-23, members' consent confirmed by the owner).
 
 ---
 

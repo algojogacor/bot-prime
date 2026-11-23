@@ -52,15 +52,15 @@ for every artifact is **AVOID PRIME | FT** (community context: AVOID CITY).
 | Source file | `WhatsApp Chat with AVOID PRIME  FT.txt` (3,866,417 bytes, 83,305 lines) |
 | SHA-256 | `262ae7acb1ccc09307bff54e7ae74e62b4b80272a231eaff3cae8fd521e483bd` |
 | Second copy | identical member inside `WhatsApp_Chat_with_AVOID_PRIME___FT.zip` (same SHA-256 — byte-verified) |
-| Companion files | 4 `.vcf` contact cards in the same directory (used only for context; never committed) |
-| Raw archive in repo | **never committed** — immutable source stays in the private workspace |
+| Companion files | 4 `.vcf` contact cards in the same directory (published under `data/source/`) |
+| Raw archive in repo | published under `data/source/` (owner-authorized 2026-11-23; the owner confirms members granted permission); SHA-256 unchanged |
 
 ## 4. Reprocessing pipeline
 
 | Stage | Script | Output |
 | --- | --- | --- |
 | 1 | `01_parse_export.py` | `normalized-messages.jsonl` (79,090 records) + meta + parse summary |
-| 2 | `02_participants.py` | `participants.json` (25 participants; private map in workspace only) |
+| 2 | `02_participants.py` | `participants.json` (25 participants; raw→key map published as `data/source/participants-map.json`) |
 | 3 | `03_statistics.py` | `statistics.json`, `language-profile.json`, `comparison.json` |
 | 4 | `04_summaries.py` | `conversation-summaries.json` (57 days, 9 weeks) |
 | 5 | `05_lore.py` | `community-lore.json` (auto candidates + 10 curated, citations verified) |
@@ -146,11 +146,14 @@ assumption is recorded in `dataset-meta.json` and every statistic.
 
 ## 6. Sanitization policy
 
-Committed artifacts contain: deterministic sender keys (`p-…`), display-name
-aliases, phone senders masked to `+CC ••••••••XX`, and message text with phone
-numbers replaced by `[no-diredam]`. The private map (raw number → key) lives only
-in the workspace. Stage 7 re-scans **every** artifact for phone patterns, the
-private numbers, and credential patterns — 0 hits (verified, quality report).
+`data/seed/` (derived artifacts) keeps the deterministic pseudonym layout: sender
+keys (`p-…`), display-name aliases, phone senders masked to `+CC ••••••••XX`, and
+message text with phone numbers replaced by `[no-diredam]`. The unmasked originals
+are published under `data/source/` by explicit owner authorization (2026-11-23) —
+the owner confirms the members represented in the dataset have granted permission.
+Stage 7 re-scans every **derived** artifact for phone patterns, the private numbers,
+and credential patterns — 0 hits (verified, quality report); credential boundaries
+(service keys, PATs, session state) remain out of the repository by design.
 
 ## 7. Provenance and information-loss review
 
@@ -161,8 +164,9 @@ Every artifact derives from the immutable source through the committed scripts:
 
 Loss inventory (what conversion to JSON/JSONL/SQLite deliberately does not carry):
 
-- raw sender identifiers (phone numbers) — intentionally excluded (privacy), preserved
-  in the private workspace map;
+- raw sender identifiers (phone numbers) — excluded from `data/seed/` derived
+  artifacts, published with the source materials under `data/source/`
+  (`participants-map.json`) by owner authorization;
 - media binary content — the export itself only contains placeholders; nothing further
   was lost by the pipeline;
 - typing indicators, reactions and ephemeral state — absent from the source export

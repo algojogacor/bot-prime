@@ -17,8 +17,9 @@ data/*
 tmp/
 *.log
 
-# Committed dataset seed artifacts (sanitized; pipeline in scripts/dataset/)
+# Committed dataset artifacts (owner-approved publication; pipeline in scripts/dataset/)
 !data/seed/
+!data/source/
 
 # OS / editor
 .DS_Store
