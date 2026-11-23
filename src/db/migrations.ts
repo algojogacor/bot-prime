@@ -74,4 +74,12 @@ export const MIGRATIONS: Migration[] = [
       `CREATE INDEX IF NOT EXISTS idx_ai_usage_day ON ai_usage (day)`,
     ],
   },
+  {
+    version: 2,
+    name: 'ai-usage-unique-index',
+    up: [
+      // Enables the day+provider upsert used by the usage tracker.
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_usage_day_provider ON ai_usage (day, provider)`,
+    ],
+  },
 ];

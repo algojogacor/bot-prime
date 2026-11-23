@@ -17,6 +17,10 @@ const envSchema = z.object({
   AI_API_KEY: z.string().min(1),
   AI_BASE_URL: z.string().min(1).optional(),
   AI_MODEL: z.string().min(1).optional(),
+  // Comma-separated provider ids tried after the primary on failure.
+  AI_FALLBACK_ORDER: z.string().default(''),
+  AI_TIMEOUT_MS: z.coerce.number().int().min(1_000).max(120_000).default(30_000),
+  AI_MAX_OUTPUT_TOKENS: z.coerce.number().int().min(50).max(4_000).default(400),
 
   // Comma-separated WhatsApp JIDs.
   OMAK_ADMIN_JIDS: z.string().default(''),

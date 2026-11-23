@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createDb } from '../../src/db/client.js';
 import { runMigrations } from '../../src/db/migrate.js';
+import { MIGRATIONS } from '../../src/db/migrations.js';
 
 let db: ReturnType<typeof createDb>;
 
@@ -42,6 +43,6 @@ describe('runMigrations', () => {
     await runMigrations(db);
     const res = await db.execute('SELECT MAX(version) AS v FROM _schema_version');
     const v = res.rows[0]?.v;
-    expect(Number(v)).toBe(1);
+    expect(Number(v)).toBe(MIGRATIONS[MIGRATIONS.length - 1]?.version ?? 0);
   });
 });

@@ -27,6 +27,12 @@ jobs:
 
       - name: Test
         run: npm test
+        env:
+          # Placeholder credentials so config validation passes in CI (no real services touched).
+          TURSO_DATABASE_URL: file:./data/test.db
+          AUTH_ENCRYPTION_KEY: dGVzdC1rZXktZm9yLWNpLXJ1bm5lcnMtd29ya2Zsb3c9
+          AI_API_KEY: test-key
+          OMAK_MAX_DAILY_AI_CALLS: '300'
 
       - name: Build
         run: npm run build
