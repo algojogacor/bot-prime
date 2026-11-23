@@ -21,6 +21,9 @@ RUN addgroup -S omak && adduser -S omak -G omak
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY package.json LICENSE ./
+# Community dataset needed by the read-only retrieval layer (data/seed is
+# committed under .dockerignore's !data/seed exception; data/source stays out).
+COPY data/seed ./data/seed
 USER omak
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \

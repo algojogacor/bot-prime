@@ -229,8 +229,11 @@ export class SocialOrchestrator {
     }
   }
 
-  private async extractMemories(chatJid: string, burst: NormalizedMessage[]): Promise<void> {    const extracted = heuristicExtract(
-      burst.map((m) => m.text ?? '').filter((t) => t.length > 0),
+  private async extractMemories(chatJid: string, burst: NormalizedMessage[]): Promise<void> {
+    const extracted = heuristicExtract(
+      burst
+        .map((m) => ({ id: m.id, text: m.text ?? '' }))
+        .filter((m) => m.text.length > 0),
     );
     for (const m of extracted) {
       await addMemory(this.deps.db, {
@@ -238,6 +241,7 @@ export class SocialOrchestrator {
         kind: m.kind,
         content: m.content,
         importance: m.importance,
+        sourceMsgId: m.sourceMsgId,
       }).catch((err) => log.warn({ err }, 'memory write failed'));
     }
   }

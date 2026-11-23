@@ -18,7 +18,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
-    "audit": "npm audit --audit-level=high"
+    "audit": "npm audit --audit-level=high",
+    "dataset:verify": "node scripts/dataset/verify.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",

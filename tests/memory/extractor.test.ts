@@ -4,12 +4,12 @@ import { heuristicExtract } from '../../src/memory/extractor.js';
 describe('heuristicExtract', () => {
   it('extracts birthdays, UIDs, events, nicknames and preferences', () => {
     const out = heuristicExtract([
-      'ultah gua 12 desember wkwk',
-      'cb uid 987654321 jangan lupa',
-      'spar jam 8 malam tanggal 5',
-      'panggil aja bang zul',
-      'jangan tag gue pas turnamen',
-    ]);
+{ id: 'x', text: 'ultah gua 12 desember wkwk' },
+{ id: 'x', text: 'cb uid 987654321 jangan lupa' },
+{ id: 'x', text: 'spar jam 8 malam tanggal 5' },
+{ id: 'x', text: 'panggil aja bang zul' },
+{ id: 'x', text: 'jangan tag gue pas turnamen' },
+]);
     const facts = out.filter((m) => m.kind === 'fact').map((m) => m.content);
     expect(facts.some((c) => c.startsWith('Ultah'))).toBe(true);
     expect(facts.some((c) => c.startsWith('UID'))).toBe(true);
@@ -21,18 +21,18 @@ describe('heuristicExtract', () => {
 
   it('deduplicates repeated facts and caps at 5', () => {
     const out = heuristicExtract([
-      'uid 111111111',
-      'uid 111111111',
-      'uid 111111111',
-      'jangan spam',
-      'jangan tag',
-      'rank legendary',
-      'rank epic',
-    ]);
+{ id: 'x', text: 'uid 111111111' },
+{ id: 'x', text: 'uid 111111111' },
+{ id: 'x', text: 'uid 111111111' },
+{ id: 'x', text: 'jangan spam' },
+{ id: 'x', text: 'jangan tag' },
+{ id: 'x', text: 'rank legendary' },
+{ id: 'x', text: 'rank epic' },
+]);
     expect(out.length).toBeLessThanOrEqual(5);
   });
 
   it('returns nothing for idle banter', () => {
-    expect(heuristicExtract(['wkwkwk', 'jir 🗿', 'gas lah'])).toEqual([]);
+    expect(heuristicExtract([{ id: 'a', text: 'wkwkwk' }, { id: 'b', text: 'jir 🗿' }, { id: 'c', text: 'gas lah' }])).toEqual([]);
   });
 });

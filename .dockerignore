@@ -6,7 +6,8 @@ coverage
 .env
 .env.*
 !.env.example
-data
+data/*
+!data/seed/
 tmp
 tests
 docs
