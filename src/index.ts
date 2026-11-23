@@ -11,6 +11,7 @@ import type { NormalizedMessage } from './whatsapp/normalize.js';
 import { SocialOrchestrator } from './social/orchestrator.js';
 import { CommandRegistry } from './commands/registry.js';
 import { registerBuiltinCommands } from './commands/builtin.js';
+import { CommunityKnowledge } from './community/knowledge.js';
 import { matchStickerByText } from './db/repos/stickers.js';
 import { loadStickerBytes } from './stickers/manager.js';
 import {
@@ -34,6 +35,16 @@ async function main(): Promise<void> {
   });
 
   const shortTerm = new ShortTermStore();
+
+  // Static community dataset (data/seed): read-only retrieval, never imported
+  // into Turso. Fail-soft: missing/corrupt seeds only disable archive features.
+  const community = new CommunityKnowledge({
+    seedDir: env.OMAK_SEED_DIR,
+    maxHits: env.OMAK_ARCHIVE_MAX_HITS,
+    budgetTokens: env.OMAK_ARCHIVE_BUDGET_TOKENS,
+  });
+  community.init();
+
   // The burst handler is bound once the orchestrator exists (below).
   let burstHandler: ((chatJid: string, msgs: NormalizedMessage[]) => Promise<void>) | null = null;
   const wa = new WhatsAppService({
@@ -46,7 +57,7 @@ async function main(): Promise<void> {
   });
 
   const commands = new CommandRegistry();
-  registerBuiltinCommands(commands, { db, wa, shortTerm });
+  registerBuiltinCommands(commands, { db, wa, shortTerm, router, knowledge: community });
 
   const orchestrator = new SocialOrchestrator({
     db,
@@ -60,6 +71,7 @@ async function main(): Promise<void> {
     },
     commands,
     getRecentRaw: (chatJid, n) => wa.recentRaw(chatJid, n),
+    community,
   });
   burstHandler = (chatJid, msgs) => orchestrator.handleBurst(chatJid, msgs);
 

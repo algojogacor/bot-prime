@@ -136,4 +136,17 @@ export const MIGRATIONS: Migration[] = [
       `CREATE INDEX idx_stickers_name ON stickers (name)`,
     ],
   },
+  {
+    version: 5,
+    name: 'group-settings',
+    up: [
+      // Persistent participation controls: !prime mode / pause survive restarts.
+      `CREATE TABLE group_settings (
+        group_jid TEXT PRIMARY KEY,
+        mode TEXT NOT NULL DEFAULT 'balanced',
+        paused INTEGER NOT NULL DEFAULT 0,
+        updated_at INTEGER NOT NULL
+      )`,
+    ],
+  },
 ];

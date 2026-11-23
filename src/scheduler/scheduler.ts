@@ -5,6 +5,7 @@ import { analyzeBurst } from '../social/context-analyzer.js';
 import { aiSummarize, heuristicSummary } from '../memory/summarizer.js';
 import { runRetention } from '../memory/retention.js';
 import { addMemory } from '../db/repos/memories.js';
+import { getGroupSettings } from '../db/repos/settings.js';
 import { buildMemoryContext } from '../memory/retrieval.js';
 import type { Client } from '@libsql/client';
 import type { ShortTermStore } from '../memory/short-term.js';
@@ -99,6 +100,9 @@ export function starterTask(
     run: async () => {
       const hourWib = new Date(Date.now() + 7 * 3_600_000).getUTCHours();
       for (const chatJid of shortTerm.activeChats()) {
+        // Paused or passive chats never get proactive starters.
+        const settings = await getGroupSettings(db, chatJid).catch(() => null);
+        if (settings?.paused || settings?.mode === 'passive') continue;
         const key = `${todayKey()}:${chatJid}`;
         const used = counters.get(key) ?? 0;
         const minutesSinceLast = shortTerm.minutesSinceLastMessage(chatJid);

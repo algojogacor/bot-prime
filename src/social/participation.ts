@@ -1,5 +1,7 @@
 export type ParticipationDecision = { act: 'reply' | 'ignore'; reason: string };
 
+export type ParticipationMode = 'passive' | 'balanced' | 'active';
+
 export type ChatReplyState = {
   lastReplyAtMs: number | null;
   repliesLastHour: number;
@@ -14,6 +16,8 @@ export type ParticipationConfig = {
   ambientReplyRate: number;
   dailyAiQuota: number;
   dailyAiUsed: number;
+  /** Persistent group mode (group_settings table). Default: balanced. */
+  mode?: ParticipationMode;
 };
 
 /**
@@ -39,9 +43,18 @@ export function shouldReply(input: {
   if (input.state.repliesLastHour >= input.config.maxRepliesPerHourPerChat) {
     return { act: 'ignore', reason: 'hourly-limit' };
   }
+  const mode = input.config.mode ?? 'balanced';
+  // passive = mentions only; active = bolder ambient rate and a shorter gap.
+  const ambientRate =
+    mode === 'passive'
+      ? 0
+      : mode === 'active'
+        ? Math.min(0.25, input.config.ambientReplyRate * 3)
+        : input.config.ambientReplyRate;
+  const minGapMs = mode === 'active' ? Math.min(input.config.minGapMs, 5_000) : input.config.minGapMs;
   if (
     input.state.lastReplyAtMs !== null &&
-    input.now - input.state.lastReplyAtMs < input.config.minGapMs
+    input.now - input.state.lastReplyAtMs < minGapMs
   ) {
     return { act: 'ignore', reason: 'reply-gap' };
   }
@@ -55,7 +68,7 @@ export function shouldReply(input: {
   if (mentioned) return { act: 'reply', reason: 'mentioned' };
 
   const rng = input.rng ?? Math.random;
-  if (rng() < input.config.ambientReplyRate) {
+  if (rng() < ambientRate) {
     return { act: 'reply', reason: 'ambient' };
   }
   return { act: 'ignore', reason: 'ambient-not-selected' };

@@ -40,6 +40,11 @@ const envSchema = z.object({
   OMAK_MAX_STARTERS_PER_DAY: z.coerce.number().int().min(0).default(2),
   // Bot nicknames the group can call it by (comma-separated, lowercase).
   OMAK_MENTION_TOKENS: z.string().default('omak,oma,mak'),
+
+  // Community dataset (static seed artifacts; retrieval is read-only).
+  OMAK_SEED_DIR: z.string().default('data/seed'),
+  OMAK_ARCHIVE_MAX_HITS: z.coerce.number().int().min(0).max(20).default(6),
+  OMAK_ARCHIVE_BUDGET_TOKENS: z.coerce.number().int().min(100).max(4_000).default(900),
 });
 
 export type Env = z.infer<typeof envSchema>;
