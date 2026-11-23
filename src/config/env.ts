@@ -22,6 +22,9 @@ const envSchema = z.object({
   OMAK_ADMIN_JIDS: z.string().default(''),
   OMAK_ALLOWED_GROUP_JIDS: z.string().default(''),
 
+  // Digits only (no +); used on first run to request a pairing code instead of QR.
+  OMAK_PAIRING_NUMBER: z.string().regex(/^\d{7,15}$/).optional(),
+
   // Quiet hours in UTC, "start-end"; 16-0 == 23:00-07:00 WIB.
   OMAK_QUIET_HOURS_UTC: z.string().regex(/^\d{1,2}-\d{1,2}$/).default('16-0'),
   OMAK_MAX_DAILY_AI_CALLS: z.coerce.number().int().min(0).default(300),

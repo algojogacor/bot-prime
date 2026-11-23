@@ -118,3 +118,8 @@ export async function useDbAuthState(
 
   return { state, saveCreds };
 }
+
+/** Wipe every stored auth key — used when WhatsApp logs the session out, so the next start re-pairs cleanly. */
+export async function clearAuthStore(db: Client): Promise<void> {
+  await db.execute('DELETE FROM auth_keys');
+}

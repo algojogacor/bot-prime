@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createDb } from '../../src/db/client.js';
 import { runMigrations } from '../../src/db/migrate.js';
-import { useDbAuthState } from '../../src/db/auth-store.js';
+import { clearAuthStore, useDbAuthState } from '../../src/db/auth-store.js';
 
 const KEY = Buffer.alloc(32, 42).toString('base64');
 
@@ -84,5 +84,15 @@ describe('useDbAuthState', () => {
 
     const other = await useDbAuthState(db, Buffer.alloc(32, 99).toString('base64'));
     expect(other.state.creds.registered).toBe(false);
+  });
+
+  it('clearAuthStore wipes credentials for a clean re-pair', async () => {
+    const { db, state, saveCreds } = await freshAuth();
+    state.creds.registered = true;
+    await saveCreds();
+    await clearAuthStore(db);
+
+    const again = await useDbAuthState(db, KEY);
+    expect(again.state.creds.registered).toBe(false);
   });
 });
