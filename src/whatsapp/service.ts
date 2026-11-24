@@ -25,6 +25,7 @@ import { normalizeMessage } from './normalize.js';
 import type { NormalizedMessage } from './normalize.js';
 import { classifyJidPair, persistJidPair } from './participants.js';
 import { OwnershipLease } from './lease.js';
+import { GatewayClient } from './gateway-client.js';
 
 const log = childLogger({ mod: 'whatsapp' });
 const baileysLog = childLogger({ mod: 'baileys' });
@@ -83,6 +84,7 @@ export class WhatsAppService {
   private sock: Socket | null = null;
   private stopped = false;
   private reconnectTimer: NodeJS.Timeout | null = null;
+  private gateway: GatewayClient | null = null;
   private reconnectDelayMs = 2_000;
   private pairingRequested = false;
   private readonly deduper = new MessageDeduper();
@@ -104,6 +106,10 @@ export class WhatsAppService {
 
   async start(): Promise<void> {
     this.stopped = false;
+    if (env.WA_TRANSPORT === 'gateway') {
+      await this.connectViaGateway();
+      return;
+    }
     await this.connect();
   }
 
@@ -112,6 +118,10 @@ export class WhatsAppService {
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
+    }
+    if (this.gateway) {
+      this.gateway.stop();
+      this.gateway = null;
     }
     const sock = this.sock;
     this.sock = null;
@@ -129,6 +139,37 @@ export class WhatsAppService {
 
   /** Send a text message with a human-like typing pause. */
   async sendText(jid: string, text: string, typingMs?: number): Promise<void> {
+    if (this.gateway) {
+      if (this.status !== 'connected') throw new Error('WhatsApp not connected (gateway)');
+      const bubbles = splitIntoBubbles(text);
+      for (let i = 0; i < bubbles.length; i++) {
+        const bubble = bubbles[i] as string;
+        const isLast = i === bubbles.length - 1;
+        const pause = typingMs ?? Math.min(2_500, 300 + bubble.length * 12);
+        const ack = await this.gateway.sendText(jid, bubble, pause > 0 ? pause : undefined);
+        const id = ack.id;
+        log.info({ jid, length: bubble.length, bubble: i + 1, of: bubbles.length }, 'text sent via gateway');
+        if (id) {
+          void insertMessages(this.opts.db, [
+            {
+              id,
+              chatJid: jid,
+              senderJid: 'me',
+              text: bubble,
+              msgType: 'text',
+              isFromMe: true,
+              timestamp: Date.now(),
+            },
+          ]).catch((err: unknown) => {
+            if (!(err instanceof DuplicateMessageError)) {
+              log.warn({ err }, 'self-message persist failed');
+            }
+          });
+        }
+        if (!isLast) await sleep(400);
+      }
+      return;
+    }
     const sock = this.sock;
     if (!sock || this.status !== 'connected') throw new Error('WhatsApp not connected');
     // Long answers are split at paragraph/sentence boundaries into ordered
@@ -181,6 +222,59 @@ export class WhatsAppService {
   /** Last raw messages per chat — used by admin commands (sticker intake). */
   recentRaw(chatJid: string, n = 10): WAMessage[] {
     return (this.rawRecent.get(chatJid) ?? []).slice(-n);
+  }
+
+  /**
+   * Gateway transport (WA_TRANSPORT=gateway): no Baileys here at all. The
+   * gateway process owns the single socket + auth; we subscribe over the
+   * Unix socket and reuse the EXACT same downstream pipeline (normalize →
+   * dedupe → persist → burst) by adapting gateway events into the same
+   * shapes the pipeline already consumes.
+   */
+  private async connectViaGateway(): Promise<void> {
+    this.status = 'connecting';
+    const gw = new GatewayClient(env.WA_GATEWAY_SOCKET);
+    this.gateway = gw;
+
+    gw.on('status', (st) => {
+      if (st.wa === 'connected') {
+        this.status = 'connected';
+        this.reconnectDelayMs = 2_000;
+        log.info('gateway says WhatsApp connected');
+        void this.bootstrapGroupRoster().catch((err) =>
+          log.warn({ err }, 'group roster bootstrap failed'),
+        );
+      } else if (st.wa === 'logged_out') {
+        this.status = 'logged_out';
+        log.warn('gateway reports WhatsApp logged out');
+      } else {
+        this.status = 'reconnecting';
+        log.info({ wa: st.wa }, 'gateway reports WhatsApp state');
+      }
+    });
+
+    gw.on('message', (ev) => {
+      // Build a WAMessage-shaped object from the gateway event so the
+      // existing normalizer/dedupe/persist path runs unchanged.
+      const waMsg = {
+        key: {
+          remoteJid: ev.from,
+          fromMe: ev.fromMe,
+          id: ev.id,
+          participant: ev.isGroup ? ev.sender : undefined,
+        },
+        message: ev.text !== undefined
+          ? (ev.raw?.message as object | undefined) ?? { conversation: ev.text }
+          : (ev.raw?.message as object | undefined),
+        messageTimestamp: Math.floor(ev.ts / 1000),
+      } as WAMessage;
+      void this.onUpsert({ messages: [waMsg], type: 'notify' } as Upsert);
+    });
+
+    gw.start();
+    // The gateway client reconnects on its own; mark ourselves 'reconnecting'
+    // until the first status event arrives.
+    log.info({ path: env.WA_GATEWAY_SOCKET }, 'attaching to wa-gateway');
   }
 
   private async connect(): Promise<void> {

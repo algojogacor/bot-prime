@@ -39,6 +39,12 @@ const envSchema = z.object({
   AI_MISTRAL_KEYS: z.string().default(''),
   AI_OLLAMA_KEYS: z.string().default(''),
 
+  // WhatsApp transport: 'direct' (this process owns Baileys — legacy) or
+  // 'gateway' (wa-gateway process owns the single connection; we consume it
+  // over a Unix socket).
+  WA_TRANSPORT: z.enum(['direct', 'gateway']).default('direct'),
+  WA_GATEWAY_SOCKET: z.string().default('/run/wa-gateway.sock'),
+
   // Comma-separated WhatsApp JIDs.
   OMAK_ADMIN_JIDS: z.string().default(''),
   OMAK_ALLOWED_GROUP_JIDS: z.string().default(''),
