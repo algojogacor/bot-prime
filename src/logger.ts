@@ -5,7 +5,17 @@ export const logger = pino({
   level: env.LOG_LEVEL,
   timestamp: pino.stdTimeFunctions.isoTime,
   redact: {
-    paths: ['apiKey', 'authToken', 'token', 'password', '*.apiKey', '*.authToken', '*.token'],
+    paths: [
+      'apiKey',
+      'authToken',
+      'token',
+      'password',
+      'pairingCode',
+      '*.apiKey',
+      '*.authToken',
+      '*.token',
+      '*.pairingCode',
+    ],
     censor: '[redacted]',
   },
 });

@@ -3,7 +3,7 @@ import { childLogger } from './logger.js';
 import { createDb } from './db/client.js';
 import { runMigrations } from './db/migrate.js';
 import { AIRouter } from './ai/router.js';
-import { buildProviders } from './ai/factory.js';
+import { buildProviders } from './ai/router.js';
 import { recordUsage } from './ai/usage.js';
 import { ShortTermStore } from './memory/short-term.js';
 import { WhatsAppService } from './whatsapp/service.js';
@@ -83,7 +83,22 @@ async function main(): Promise<void> {
   scheduler.start();
 
   await wa.start();
-  const health = await startHealthServer({ isReady: () => wa.isReady() }, env.PORT);
+  const health = await startHealthServer(
+    {
+      isReady: () => wa.isReady(),
+      // A live DB probe backs /readyz: a connected socket with a dead database
+      // is not ready to process bursts.
+      pingDb: async () => {
+        try {
+          await db.execute('SELECT 1');
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    },
+    env.PORT,
+  );
 
   const shutdown = async (signal: string): Promise<void> => {
     log.info({ signal }, 'shutting down');

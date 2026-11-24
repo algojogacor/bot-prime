@@ -71,35 +71,74 @@ export class OpenAICompatProvider implements AIProvider {
     };
     if (req.jsonMode) body.response_format = { type: 'json_object' };
 
-    let res: Response;
-    try {
-      res = await (this.cfg.fetchImpl ?? fetch)(`${this.cfg.baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          authorization: `Bearer ${this.cfg.apiKey}`,
-          ...(this.cfg.name === 'openrouter'
-            ? { 'http-referer': 'https://github.com/algojogacor/bot-prime', 'x-title': 'Omak' }
-            : {}),
-        },
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(this.cfg.timeoutMs),
-      });
-    } catch (err) {
-      throw new AIProviderError(this.name, `request failed: ${String(err)}`);
-    }
-
-    if (!res.ok) {
+    // Retry on transient failures only (openai-node conventions: 408/429/5xx),
+    // at most 2 retries, exponential backoff with jitter, honoring the
+    // provider's Retry-After header on 429 (Groq sends fractional seconds).
+    const MAX_ATTEMPTS = 3;
+    let res: Response | null = null;
+    let lastError: AIProviderError | null = null;
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      if (attempt > 0) {
+        const retryAfterMs = Number(res?.headers?.get('retry-after'));
+        const backoffMs =
+          Number.isFinite(retryAfterMs) && retryAfterMs > 0
+            ? Math.min(retryAfterMs * 1000, 10_000)
+            : Math.min(500 * 2 ** (attempt - 1), 4_000);
+        const jitterMs = 1 + Math.floor(Math.random() * 250);
+        await new Promise((r) => setTimeout(r, backoffMs + jitterMs));
+      }
+      try {
+        res = await (this.cfg.fetchImpl ?? fetch)(`${this.cfg.baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            authorization: `Bearer ${this.cfg.apiKey}`,
+            ...(this.cfg.name === 'openrouter'
+              ? { 'http-referer': 'https://github.com/algojogacor/bot-prime', 'x-title': 'Omak' }
+              : {}),
+          },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(this.cfg.timeoutMs),
+        });
+      } catch (err) {
+        lastError = new AIProviderError(this.name, `request failed: ${String(err)}`);
+        continue; // network error/timeout → retry
+      }
+      if (res.ok) break;
       const snippet = (await res.text()).slice(0, 300);
-      throw new AIProviderError(this.name, `HTTP ${res.status}: ${snippet}`, res.status);
+      const status = res.status;
+      lastError = new AIProviderError(this.name, `HTTP ${status}: ${snippet}`, status);
+      if (status !== 408 && status !== 429 && status < 500) break; // non-transient → fail fast
     }
+    const finalRes = res;
+    if (!finalRes || !finalRes.ok) {
+      throw (
+        lastError ??
+        new AIProviderError(this.name, 'request failed after retries')
+      );
+    }
+    const okRes = finalRes;
 
-    const json = (await res.json()) as {
-      choices?: { message?: { content?: string | null } }[];
+    const json = (await okRes.json()) as {
+      choices?: { message?: { content?: string | null }; finish_reason?: string | null }[];
       usage?: { prompt_tokens?: number; completion_tokens?: number };
     };
-    const text = json.choices?.[0]?.message?.content ?? '';
-    if (!text) throw new AIProviderError(this.name, 'empty completion');
+    const choice = json.choices?.[0];
+    const text = choice?.message?.content ?? '';
+    if (!text) {
+      // Reasoning models (e.g. openai/gpt-oss-120b) may spend the whole
+      // max_tokens budget on hidden reasoning and return content:null with
+      // finish_reason 'length'. That's a truncation problem, not a provider
+      // outage — surface it distinctly so callers can retry with a larger
+      // budget instead of treating the provider as dead.
+      if (choice?.finish_reason === 'length') {
+        throw new AIProviderError(
+          this.name,
+          'completion truncated before any content (reasoning consumed the token budget); retry with a larger max_tokens',
+        );
+      }
+      throw new AIProviderError(this.name, 'empty completion');
+    }
 
     return {
       text,

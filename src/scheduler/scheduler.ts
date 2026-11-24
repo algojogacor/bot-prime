@@ -1,4 +1,5 @@
 import { childLogger } from '../logger.js';
+import { env } from '../config/env.js';
 import type { AIRouter } from '../ai/router.js';
 import { buildStarterPrompt, localStarter, shouldStartConversation } from '../social/starter.js';
 import { analyzeBurst } from '../social/context-analyzer.js';
@@ -12,6 +13,24 @@ import type { ShortTermStore } from '../memory/short-term.js';
 import type { Sender } from '../social/orchestrator.js';
 
 const log = childLogger({ mod: 'scheduler' });
+
+/**
+ * Quiet hours from OMAK_QUIET_HOURS_UTC ("start-end" UTC hour numbers, e.g.
+ * "16-0" == 23:00-07:00 WIB). During quiet hours the starter task stays
+ * silent entirely — proactive messages at night are the most annoying thing
+ * a group bot can do. Handles windows that wrap past midnight.
+ */
+export function isQuietHour(hourWib: number, quietHoursUtc = env.OMAK_QUIET_HOURS_UTC): boolean {
+  const [startStr, endStr] = quietHoursUtc.split('-');
+  const start = Number(startStr);
+  const end = Number(endStr);
+  if (!Number.isInteger(start) || !Number.isInteger(end)) return false;
+  const hourUtc = (hourWib + 24 - 7) % 24; // WIB → UTC
+  if (start === end) return false; // zero-length window
+  return start < end
+    ? hourUtc >= start && hourUtc < end
+    : hourUtc >= start || hourUtc < end; // wraps midnight
+}
 
 export type ScheduledTask = {
   name: string;
@@ -99,7 +118,9 @@ export function starterTask(
     intervalMs: 15 * 60_000,
     run: async () => {
       const hourWib = new Date(Date.now() + 7 * 3_600_000).getUTCHours();
+      const quiet = isQuietHour(hourWib);
       for (const chatJid of shortTerm.activeChats()) {
+        if (quiet) continue; // hard quiet hours: never start conversations at night
         // Paused or passive chats never get proactive starters.
         const settings = await getGroupSettings(db, chatJid).catch(() => null);
         if (settings?.paused || settings?.mode === 'passive') continue;
@@ -118,7 +139,7 @@ export function starterTask(
                 .generate({
                   system: buildStarterPrompt(topics, memories ? [memories] : []),
                   messages: [{ role: 'user', content: 'bikin pembuka 1 kalimat' }],
-                  maxTokens: 60,
+                  maxTokens: 160,
                 })
                 .then((r) => r.text.trim())
                 .catch(() => localStarter(topics))

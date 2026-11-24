@@ -45,7 +45,7 @@ export type CommunityContext = {
   indexKind: 'fts5' | 'jsonl' | 'unavailable';
 };
 
-type IndexRow = { id: string; ts: string; senderKey: string; text: string };
+type IndexRow = { id: string; ts: string; senderKey: string; text: string; lower: string };
 
 type ParticipantInfo = {
   key: string;
@@ -135,6 +135,10 @@ export class CommunityKnowledge {
   private byAlias = new Map<string, ParticipantInfo>();
   private lore: RawLoreEntry[] = [];
   private identity = 'AVOID PRIME | FT (komunitas AVOID CITY)';
+  /** Community-signal lexicon: gates archive injection to community-relevant queries. */
+  private lexicon = new Set<string>();
+  /** Average lowercased message length — length normalization for the JSONL scorer. */
+  private jsonlAvgLen = 1;
 
   constructor(opts: CommunityOptions) {
     this.opts = { ...DEFAULTS, ...opts };
@@ -172,9 +176,36 @@ export class CommunityKnowledge {
       }
       const profilePath = join(dir, 'language-profile.json');
       if (existsSync(profilePath)) {
-        const profile = JSON.parse(readFileSync(profilePath, 'utf-8')) as { community?: string };
-        if (profile.community) this.identity = profile.community;
+        const profile = JSON.parse(readFileSync(profilePath, 'utf-8')) as {
+          community?: string;
+          signature_terms?: Record<string, number>;
+        };
+        if (profile.community) {
+          // Canonical parent community (AVOID CITY) is part of the identity
+          // per the audit reconciliation — keep it on every status surface.
+          this.identity = profile.community.includes('AVOID CITY')
+            ? profile.community
+            : `${profile.community} (komunitas AVOID CITY)`;
+        }
+        for (const term of Object.keys(profile.signature_terms ?? {})) this.addLexicon(term);
       }
+      const statsPath = join(dir, 'statistics.json');
+      if (existsSync(statsPath)) {
+        const stats = JSON.parse(readFileSync(statsPath, 'utf-8')) as { top_tokens?: [string, number][] };
+        for (const [tok] of (stats.top_tokens ?? []).slice(0, 120)) this.addLexicon(tok);
+      }
+      for (const info of this.byKey.values()) {
+        for (const alias of info.aliases) {
+          for (const word of alias.split(/\s+/)) this.addLexicon(word);
+        }
+      }
+      for (const entry of this.lore) {
+        for (const word of `${entry.title ?? ''} ${(entry.tags ?? []).join(' ')}`.split(/\s+/)) {
+          this.addLexicon(word);
+        }
+      }
+      // Canonical identity words are always community signals.
+      for (const word of this.identity.split(/[^A-Za-z]+/)) this.addLexicon(word);
       this.openIndex(dir);
       this.available = this.indexKind !== 'unavailable' || this.byKey.size > 0;
     } catch (err) {
@@ -188,6 +219,23 @@ export class CommunityKnowledge {
       );
     }
     return this.available;
+  }
+
+  private addLexicon(word: string): void {
+    const t = nfkcLower(word);
+    // Function words, question words and pure interjections are NOT community
+    // signals — 'apa' appearing in top_tokens once gated every question through
+    // the archive (dry-run C08 regression).
+    if (t.length < 2) return;
+    if (/^(http|https|www)/.test(t)) return;
+    if (
+      /^(apa|siapa|kapan|kenapa|gimana|gmn|kok|dong|deh|sih|ya|yg|di|ke|nya|aja|saja|sama|dan|atau|kalau|kalo|juga|masih|sudah|udah|belum|nanti|banget|itu|ini|wkwk|wkwkwk|jir|wok|anjir|anj|bang|bro|cuy|guys)$/.test(
+        t,
+      )
+    ) {
+      return;
+    }
+    this.lexicon.add(t);
   }
 
   private openIndex(dir: string): void {
@@ -211,7 +259,13 @@ export class CommunityKnowledge {
         if (!line.trim()) continue;
         try {
           const row = JSON.parse(line) as { id: string; ts: string; sender_key: string; text: string };
-          const r: IndexRow = { id: row.id, ts: row.ts, senderKey: row.sender_key, text: row.text };
+          const r: IndexRow = {
+            id: row.id,
+            ts: row.ts,
+            senderKey: row.sender_key,
+            text: row.text,
+            lower: nfkcLower(row.text),
+          };
           this.jsonlRows.push(r);
           this.jsonlById.set(r.id, r);
         } catch {
@@ -219,6 +273,10 @@ export class CommunityKnowledge {
         }
       }
       this.indexKind = this.jsonlRows.length > 0 ? 'jsonl' : 'unavailable';
+      if (this.jsonlRows.length > 0) {
+        this.jsonlAvgLen =
+          this.jsonlRows.reduce((sum, r) => sum + r.lower.length, 0) / this.jsonlRows.length || 1;
+      }
     }
   }
 
@@ -247,7 +305,7 @@ export class CommunityKnowledge {
         const row = this.db
           .prepare('SELECT id, ts, sender_key, text FROM msgs WHERE id = ?')
           .get(id) as { id: string; ts: string; sender_key: string; text: string } | undefined;
-        if (row) return { id: row.id, ts: row.ts, senderKey: row.sender_key, text: row.text };
+        if (row) return { id: row.id, ts: row.ts, senderKey: row.sender_key, text: row.text, lower: nfkcLower(row.text) };
         return null;
       } catch {
         return null;
@@ -334,26 +392,50 @@ export class CommunityKnowledge {
                 'SELECT id, ts, sender_key, text, bm25(msgs) AS b FROM msgs WHERE msgs MATCH ? ORDER BY b LIMIT ?',
               )
               .all(expr, fetchLimit) as { id: string; ts: string; sender_key: string; text: string }[]);
-        return rows.map((r) => ({ id: r.id, ts: r.ts, senderKey: r.sender_key, text: r.text }));
+        return rows.map((r) => ({ id: r.id, ts: r.ts, senderKey: r.sender_key, text: r.text, lower: nfkcLower(r.text) }));
       } catch (err) {
         log.warn({ err }, 'FTS5 query failed; falling back to JSONL');
         this.db = null;
         this.indexKind = this.jsonlRows.length > 0 ? 'jsonl' : 'unavailable';
       }
     }
-    // In-memory scan (fallback path).
+    // In-memory scan (fallback path) — BM25-approximate: IDF-weighted with
+    // document-length normalization so single-term queries rank like FTS5
+    // bm25 does (dry-run R13 parity).
     const loweredTerms = terms.map(nfkcLower);
-    const scored: { row: IndexRow; covered: number }[] = [];
+    const total = this.jsonlRows.length || 1;
+    const k1 = 1.2;
+    const b = 0.75;
+    const df = new Map<string, number>();
+    for (const t of loweredTerms) df.set(t, 0);
     for (const row of this.jsonlRows) {
       if (senderKey && row.senderKey !== senderKey) continue;
-      const loweredText = nfkcLower(row.text);
-      let covered = 0;
-      for (const term of loweredTerms) {
-        if (loweredText.includes(term)) covered += 1;
+      for (const t of loweredTerms) {
+        if (row.lower.includes(t)) df.set(t, (df.get(t) ?? 0) + 1);
       }
-      if (covered > 0) scored.push({ row, covered });
     }
-    scored.sort((a, b) => b.covered - a.covered);
+    const idf = (t: string) => Math.log(1 + total / Math.max(1, df.get(t) ?? 1));
+    const tf = (row: IndexRow, t: string) =>
+      Math.min(3, row.lower.split(t).length - 1);
+    const norm = (row: IndexRow) =>
+      k1 * (1 - b + (b * row.lower.length) / Math.max(1, this.jsonlAvgLen));
+    const scored: { row: IndexRow; score: number }[] = [];
+    for (const row of this.jsonlRows) {
+      if (senderKey && row.senderKey !== senderKey) continue;
+      let score = 0;
+      let covered = 0;
+      for (const t of loweredTerms) {
+        const freq = tf(row, t);
+        if (freq > 0) {
+          covered += 1;
+          score += (idf(t) * (freq * (k1 + 1))) / (freq + norm(row));
+        }
+      }
+      if (covered === 0) continue;
+      if (covered === loweredTerms.length && loweredTerms.length >= 2) score += 2;
+      scored.push({ row, score });
+    }
+    scored.sort((a, b) => b.score - a.score || (a.row.id < b.row.id ? -1 : 1));
     return scored.slice(0, fetchLimit).map((s) => s.row);
   }
 
@@ -424,6 +506,17 @@ export class CommunityKnowledge {
     const budgetChars = (overrides?.budgetTokens ?? this.opts.budgetTokens) * 4;
     const indexKind = this.indexKind;
     if (!this.init() || indexKind === 'unavailable') {
+      return { block: null, hits: [], lore: [], indexKind };
+    }
+    // Community-signal gate: general-knowledge questions (e.g. "HTTP vs HTTPS")
+    // must not pull archive noise into the prompt (dry-run C08). A query passes
+    // when it shares a term with the community lexicon or names a member.
+    const terms = queryTerms(query);
+    const queryLower = nfkcLower(query);
+    const aliasMentioned =
+      terms.some((t) => this.lexicon.has(t)) ||
+      [...this.byAlias.keys()].some((a) => a.length >= 4 && queryLower.includes(a));
+    if (!aliasMentioned) {
       return { block: null, hits: [], lore: [], indexKind };
     }
     const hits = this.searchHistory(query, maxHits);

@@ -14,13 +14,30 @@ const envSchema = z.object({
   AUTH_ENCRYPTION_KEY: z.string().min(1),
 
   AI_PROVIDER: z.enum(['openai', 'anthropic', 'gemini', 'openrouter']).default('openrouter'),
-  AI_API_KEY: z.string().min(1),
+  AI_API_KEY: z.string().default(''),
   AI_BASE_URL: z.string().min(1).optional(),
   AI_MODEL: z.string().min(1).optional(),
   // Comma-separated provider ids tried after the primary on failure.
   AI_FALLBACK_ORDER: z.string().default(''),
   AI_TIMEOUT_MS: z.coerce.number().int().min(1_000).max(120_000).default(30_000),
-  AI_MAX_OUTPUT_TOKENS: z.coerce.number().int().min(50).max(4_000).default(400),
+
+  // Output-token policy: NO arbitrary low application cap. The provider's
+  // native completion capacity is respected; these are optional, generous
+  // guards (cost/abuse bound), not truncation knobs — unset means the
+  // provider decides.
+  AI_MAX_OUTPUT_TOKENS: z.coerce.number().int().min(50).max(32_000).optional(),
+  AI_CONTINUATION_MAX_TOKENS: z.coerce.number().int().min(256).max(32_000).default(4_096),
+
+  // Per-provider credential pools (Bot Prime's OWN keys only; comma lists
+  // rotate on 401/403/429). Providers without an authorized key are part of
+  // the catalog but are never routed to.
+  AI_GROQ_KEYS: z.string().default(''),
+  AI_GEMINI_KEYS: z.string().default(''),
+  AI_NVIDIA_KEYS: z.string().default(''),
+  AI_DEEPSEEK_KEYS: z.string().default(''),
+  AI_COHERE_KEYS: z.string().default(''),
+  AI_MISTRAL_KEYS: z.string().default(''),
+  AI_OLLAMA_KEYS: z.string().default(''),
 
   // Comma-separated WhatsApp JIDs.
   OMAK_ADMIN_JIDS: z.string().default(''),

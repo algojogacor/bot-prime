@@ -20,6 +20,8 @@ export type GenerateResult = {
   provider: string;
   model: string;
   usage?: TokenUsage;
+  /** Provider-reported stop condition: 'stop' (complete) or 'length' (truncated). */
+  finishReason?: string;
 };
 
 export interface AIProvider {

@@ -13,6 +13,10 @@ describe('buildSystemPrompt', () => {
     expect(prompt).toContain('🗿');
     expect(prompt).toContain('DILARANG');
     expect(prompt).toContain('TIDAK PERNAH mengaku manusia');
+    // v3: complete-thought directive, not clipped one-liners
+    expect(prompt).toContain('pikiran yang utuh');
+    expect(prompt).toContain('nyambung');
+    // v3: turn continuity block (asserted only when turns are passed)
   });
 
   it('renders recent context and the incoming burst', () => {
@@ -39,5 +43,28 @@ describe('buildSystemPrompt', () => {
       webResults: 'Hasil: liga mulai 1 Desember',
     });
     expect(prompt).toContain('Hasil: liga mulai 1 Desember');
+  });
+});
+
+describe('buildSystemPrompt — aiTurns continuity', () => {
+  it('injects the last AI turns so follow-ups connect', () => {
+    const prompt = buildSystemPrompt({
+      isGroup: true,
+      recentMessages: [],
+      incoming: [{ sender: 'x', text: 'bukan gitu maksud gw' }],
+      aiTurns: [{ sender: 'x', question: 'siapa kiper kita', answer: 'kiper kita vhez' }],
+    });
+    expect(prompt).toContain('siapa kiper kita');
+    expect(prompt).toContain('kiper kita vhez');
+    expect(prompt).toContain('jangan ulang dari nol');
+  });
+
+  it('omits the block when there are no turns', () => {
+    const prompt = buildSystemPrompt({
+      isGroup: true,
+      recentMessages: [],
+      incoming: [{ sender: 'x', text: 'gas' }],
+    });
+    expect(prompt).not.toContain('Obrolan AI terakhir');
   });
 });

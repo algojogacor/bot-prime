@@ -1,12 +1,12 @@
 export type ValidationResult = { ok: true; text: string } | { ok: false; reason: string };
 
-const MAX_LENGTH = 1_000;
-
 /**
  * Validate/normalize an AI reply before it goes to WhatsApp:
  * - strips leaked markdown fences (jsonMode providers sometimes wrap anyway),
- * - caps length (a chat bot quoting an essay is a persona violation),
- * - collapses 3+ blank lines to keep the short-burst style.
+ * - unwraps an accidental whole-reply JSON envelope ({"speak": ...}),
+ * - collapses 3+ blank lines.
+ * NO arbitrary length cap: long answers are valid; the WhatsApp transport
+ * splits them into ordered bubbles instead of truncating content.
  */
 export function validateReply(raw: string): ValidationResult {
   let text = raw.trim();
@@ -18,9 +18,20 @@ export function validateReply(raw: string): ValidationResult {
     .trim();
   if (!text) return { ok: false, reason: 'empty-after-fence-strip' };
 
-  if (text.length > MAX_LENGTH) {
-    text = `${text.slice(0, MAX_LENGTH).trimEnd()}…`;
+  if (text.startsWith('{') && text.endsWith('}')) {
+    try {
+      const obj = JSON.parse(text) as { speak?: unknown; text?: unknown; reply?: unknown };
+      const spoken =
+        typeof obj.speak === 'string' ? obj.speak
+        : typeof obj.text === 'string' ? obj.text
+        : typeof obj.reply === 'string' ? obj.reply
+        : null;
+      if (spoken && spoken.trim()) text = spoken.trim();
+    } catch {
+      // plain text that happens to look like JSON — keep as-is
+    }
   }
+
   text = text.replace(/\n{3,}/g, '\n\n');
   return { ok: true, text };
 }

@@ -19,7 +19,8 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "audit": "npm audit --audit-level=high",
-    "dataset:verify": "node scripts/dataset/verify.mjs"
+    "dataset:verify": "node scripts/dataset/verify.mjs",
+    "dry-run": "tsx scripts/dry-run/cli.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",

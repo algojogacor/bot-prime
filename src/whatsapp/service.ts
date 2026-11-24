@@ -9,10 +9,17 @@ import {
 import type { MessageUpsertType, WAMessage } from '@whiskeysockets/baileys';
 import { env } from '../config/env.js';
 import { childLogger } from '../logger.js';
-import { insertMessages } from '../db/repos/messages.js';
-import { replaceParticipants, upsertGroupMeta } from '../db/repos/groups.js';
+import { insertMessages, DuplicateMessageError } from '../db/repos/messages.js';
+import { getMessageById } from '../db/repos/messages.js';
+import {
+  replaceParticipants,
+  upsertGroupMeta,
+  getGroupMeta,
+  listParticipants,
+} from '../db/repos/groups.js';
 import { useDbAuthState, clearAuthStore } from '../db/auth-store.js';
 import { BurstCollector } from './burst.js';
+import { splitIntoBubbles } from './bubbles.js';
 import { MessageDeduper } from './dedupe.js';
 import { normalizeMessage } from './normalize.js';
 import type { NormalizedMessage } from './normalize.js';
@@ -124,13 +131,43 @@ export class WhatsAppService {
   async sendText(jid: string, text: string, typingMs?: number): Promise<void> {
     const sock = this.sock;
     if (!sock || this.status !== 'connected') throw new Error('WhatsApp not connected');
-    const pause = typingMs ?? Math.min(2_500, 300 + text.length * 25);
-    if (pause > 0) {
-      await sock.sendPresenceUpdate('composing', jid);
-      await sleep(pause);
+    // Long answers are split at paragraph/sentence boundaries into ordered
+    // bubbles — nothing is cut, and the group sees them arrive in order.
+    const bubbles = splitIntoBubbles(text);
+    for (let i = 0; i < bubbles.length; i++) {
+      const bubble = bubbles[i] as string;
+      const isLast = i === bubbles.length - 1;
+      const pause = typingMs ?? Math.min(2_500, 300 + bubble.length * 12);
+      if (pause > 0) {
+        await sock.sendPresenceUpdate('composing', jid);
+        await sleep(pause);
+      }
+      const sent = await sock.sendMessage(jid, { text: bubble });
+      log.info({ jid, length: bubble.length, bubble: i + 1, of: bubbles.length }, 'text sent');
+      // Persist our own outbound message so reply-to-me detection and the
+      // conversation history stay complete (previous gap: only 2/510 rows).
+      const id = sent?.key?.id;
+      if (id) {
+        void insertMessages(this.opts.db, [
+          {
+            id,
+            chatJid: jid,
+            senderJid: this.sock?.user?.id ?? 'me',
+            text: bubble,
+            msgType: 'text',
+            isFromMe: true,
+            timestamp: Date.now(),
+          },
+        ]).catch((err: unknown) => {
+          // A redelivered echo may race with messages.upsert — duplicates are
+          // expected and harmless; anything else is logged, never thrown.
+          if (!(err instanceof DuplicateMessageError)) {
+            log.warn({ err }, 'self-message persist failed');
+          }
+        });
+      }
+      if (!isLast) await sleep(400);
     }
-    await sock.sendMessage(jid, { text });
-    log.info({ jid, length: text.length }, 'text sent');
   }
 
   /** Send a sticker (WEBP bytes). */
@@ -173,6 +210,30 @@ export class WhatsAppService {
       printQRInTerminal: false,
       markOnlineOnConnect: false,
       syncFullHistory: false,
+      // Resolve quoted replies from our persisted copy instead of Baileys'
+      // in-memory store (README: avoid in-memory stores on small VMs).
+      getMessage: async (key) => {
+        if (!key.remoteJid || !key.id) return undefined;
+        const stored = await getMessageById(this.opts.db, key.remoteJid, key.id).catch(
+          () => null,
+        );
+        if (!stored?.text) return undefined;
+        return { conversation: stored.text };
+      },
+      // Group metadata served from our DB snapshot; falls back to a network
+      // fetch when unknown, so Baileys needn't keep its own growing cache.
+      cachedGroupMetadata: async (jid) => {
+        const meta = await getGroupMeta(this.opts.db, jid).catch(() => null);
+        if (!meta) return undefined;
+        const participants = await listParticipants(this.opts.db, jid).catch(() => []);
+        return {
+          id: jid,
+          subject: meta.name ?? '',
+          desc: meta.description,
+          owner: undefined,
+          participants: participants.map((p) => ({ id: p.jid, admin: p.role as 'admin' | undefined })),
+        };
+      },
     });
     this.sock = sock;
 
@@ -202,6 +263,15 @@ export class WhatsAppService {
     const sock = this.sock;
     if (!sock) return;
     const meta = await sock.groupMetadata(groupJid);
+    // The group NAME lives in group_meta — without it the AI prompt has no
+    // chat context (observed live: participants bootstrapped but group_meta
+    // stayed empty because only 'groups.update' events ever wrote names).
+    await upsertGroupMeta(this.opts.db, {
+      groupJid,
+      name: meta.subject ?? undefined,
+      description: meta.desc ?? undefined,
+      announce: meta.announce,
+    }).catch((err) => log.warn({ err, group: groupJid }, 'group meta upsert failed'));
     await replaceParticipants(
       this.opts.db,
       groupJid,
@@ -211,6 +281,30 @@ export class WhatsAppService {
         role: p.admin ?? undefined,
       })),
     );
+  }
+
+  /**
+   * On (re)connect, refresh group metadata for every group we have messages
+   * from. Bounded to the distinct chat jids already persisted, sequential to
+   * stay gentle on the 1GB VM, and fail-soft per group.
+   */
+  private async bootstrapGroupRoster(): Promise<void> {
+    const sock = this.sock;
+    if (!sock) return;
+    const res = await this.opts.db.execute(
+      "SELECT DISTINCT chat_jid FROM messages WHERE chat_jid LIKE '%@g.us' LIMIT 50",
+    );
+    const groupJids = res.rows.map((r) => String(r.chat_jid));
+    for (const gid of groupJids) {
+      try {
+        await this.refreshParticipants(gid);
+      } catch (err) {
+        log.warn({ err, group: gid }, 'roster bootstrap: group metadata fetch failed');
+      }
+    }
+    if (groupJids.length > 0) {
+      log.info({ groups: groupJids.length }, 'group roster bootstrapped');
+    }
   }
 
   private onConnectionUpdate(u: ConnUpdate): void {
@@ -230,6 +324,15 @@ export class WhatsAppService {
       this.status = 'connected';
       this.reconnectDelayMs = 2_000;
       log.info({ user: this.sock?.user?.id }, 'WhatsApp connected');
+      // Bootstrap the roster for every group we know from persisted messages:
+      // 'group-participants.update' only fires on join/leave, so a fresh
+      // process would otherwise never populate group_meta / participants
+      // (observed live: both tables stayed empty after pairing until a
+      // member joined/left). Group names drive the AI prompt's chat context
+      // and admin checks rely on participant data.
+      void this.bootstrapGroupRoster().catch((err) =>
+        log.warn({ err }, 'group roster bootstrap failed'),
+      );
     } else if (u.connection === 'close') {
       const code = (
         u.lastDisconnect?.error as { output?: { statusCode?: number } } | undefined
@@ -279,7 +382,22 @@ export class WhatsAppService {
         batch.map(toStored),
       );
     } catch (err) {
+      // Durable dedupe: a redelivered message whose id is already in the DB
+      // (e.g. after LRU eviction or a process restart) must not be processed
+      // twice — the unique (id) constraint is the source of truth.
+      if (err instanceof DuplicateMessageError) {
+        log.info(
+          { chatJid: batch[0]?.chatJid, inserted: err.inserted, attempted: err.attempted },
+          'duplicate delivery suppressed',
+        );
+        return;
+      }
+      // A genuine persistence failure is NOT safe to swallow: persisting first
+      // means a crash before processing still leaves the ids in place, so
+      // redelivery is suppressed after restart. Dropping the batch here only
+      // risks losing one burst, never double-replying.
       log.error({ err }, 'message persistence failed');
+      return;
     }
     for (const m of batch) {
       await persistMessageJidPair(this.opts.db, m).catch((err) =>

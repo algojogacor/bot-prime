@@ -31,4 +31,13 @@ export function hasUnverifiableClaim(reply: string, contextText: string): boolea
 }
 
 /** Safe replacement when a reply fails the truth check. */
-export const TRUTH_FALLBACK = 'wkwk ya gitu deh 🗿';
+export const TRUTH_FALLBACKS = [
+  'wkwk ya gitu deh 🗿',
+  'itu mah ngarang, gw ga bisa mastiin wkwk',
+  'ga ada bahannya di chat, gw diam aja deh 🗿',
+];
+export const TRUTH_FALLBACK = TRUTH_FALLBACKS[0] as string;
+/** Rotating pick so the safety fallback never repeats verbatim. */
+export function nextTruthFallback(): string {
+  return TRUTH_FALLBACKS[Math.floor(Math.random() * TRUTH_FALLBACKS.length)] as string;
+}

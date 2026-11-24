@@ -18,13 +18,16 @@ import type { ChatReplyState } from './participation.js';
 import { analyzeBurst } from './context-analyzer.js';
 import { RageBaitLimiter, isRageBaitRequest, RAGE_BAIT_DEFLECTIONS } from './rage-bait.js';
 import { localRoast, ROAST_GUIDELINES } from './roast.js';
-import { hasUnverifiableClaim, TRUTH_FALLBACK } from './personality.js';
+import { hasUnverifiableClaim, nextTruthFallback } from './personality.js';
 import type { CommunityKnowledge } from '../community/knowledge.js';
 import type { NormalizedMessage } from '../whatsapp/normalize.js';
 import type { WAMessage } from '@whiskeysockets/baileys';
 import type { CommandRegistry } from '../commands/registry.js';
 
 const log = childLogger({ mod: 'social' });
+
+/** AI turns older than this stop being injected into the prompt. */
+const AI_TURN_TTL_MS = 15 * 60_000;
 
 export type Sender = { sendText(jid: string, text: string): Promise<void> };
 
@@ -62,9 +65,24 @@ export class SocialOrchestrator {
   private readonly mentionTokens: string[];
   /** Short TTL cache so bursts don't hit the settings table every time. */
   private readonly settingsCache = new Map<string, { settings: GroupSettings; at: number }>();
+  /** Rolling per-chat AI turns for continuity (pattern proven next door). */
+  private readonly aiTurns = new Map<string, { sender: string; question: string; answer: string; ts: number }[]>();
 
   constructor(private readonly deps: OrchestratorDeps) {
     this.mentionTokens = parseList(env.OMAK_MENTION_TOKENS);
+  }
+
+  private rememberTurn(chatJid: string, sender: string, question: string, answer: string): void {
+    const fresh = (this.aiTurns.get(chatJid) ?? []).filter((t) => Date.now() - t.ts < AI_TURN_TTL_MS);
+    fresh.push({ sender, question: question.slice(0, 400), answer: answer.slice(0, 700), ts: Date.now() });
+    while (fresh.length > 6) fresh.shift();
+    this.aiTurns.set(chatJid, fresh);
+  }
+
+  private recentTurns(chatJid: string): { sender: string; question: string; answer: string }[] {
+    const fresh = (this.aiTurns.get(chatJid) ?? []).filter((t) => Date.now() - t.ts < AI_TURN_TTL_MS);
+    this.aiTurns.set(chatJid, fresh);
+    return fresh;
   }
 
   private async settingsFor(chatJid: string): Promise<GroupSettings> {
@@ -197,6 +215,7 @@ export class SocialOrchestrator {
       }
     })();
     const chatName = (await getGroupMeta(this.deps.db, chatJid).catch(() => null))?.name;
+    const aiTurns = this.recentTurns(chatJid);
     const system =
       buildSystemPrompt({
         chatName,
@@ -205,25 +224,54 @@ export class SocialOrchestrator {
         incoming: humanMessages.map((m) => ({ sender: displayName(m), text: m.text ?? '' })),
         webResults: memoryBlock ? `Fakta grup terkait:\n${memoryBlock}` : undefined,
         community: communityBlock ?? undefined,
+        aiTurns,
       }) + `\n\n## Roast rules\n${ROAST_GUIDELINES}`;
 
     try {
+      // No application token cap: provider-native completion capacity with
+      // an optional generous guard from env (AI_MAX_OUTPUT_TOKENS), never the
+      // old 400/900 clipping budget.
       const result = await this.deps.router.generate({
         system,
-        messages: [{ role: 'user', content: lastText }],
+        messages: [
+          ...aiTurns.slice(-3).map((t) => ({ role: 'assistant' as const, content: `(${t.sender} tanya: ${t.question}) omak: ${t.answer}` })),
+          { role: 'user', content: lastText },
+        ],
         maxTokens: env.AI_MAX_OUTPUT_TOKENS,
         temperature: 1,
       });
-      const validation = validateReply(result.text);
+
+      // finish_reason=length → one bounded continuation (provider-supported),
+      // explicitly told not to repeat what it already wrote.
+      let fullText = result.text;
+      if (result.finishReason === 'length' && fullText.trim()) {
+        try {
+          const continued = await this.deps.router.generate({
+            system,
+            messages: [
+              { role: 'assistant', content: fullText },
+              { role: 'user', content: 'lanjutin dari yang terakhir. JANGAN ulang bagian awal, langsung sambung kalimat terputus.' },
+            ],
+            maxTokens: env.AI_CONTINUATION_MAX_TOKENS,
+            temperature: 1,
+          });
+          fullText = `${fullText}${continued.text.startsWith(fullText.slice(-40)) ? '' : '\n'}${continued.text}`;
+        } catch (err) {
+          log.warn({ err }, 'continuation failed; sending what completed');
+        }
+      }
+
+      const validation = validateReply(fullText);
       if (!validation.ok) {
         log.info({ reason: validation.reason }, 'reply rejected by validator');
         return;
       }
       const contextText = recent.map((m) => `${m.sender}: ${m.text}`).join('\n');
       const reply = hasUnverifiableClaim(validation.text, contextText)
-        ? TRUTH_FALLBACK
+        ? nextTruthFallback()
         : validation.text;
       await this.send(chatJid, reply);
+      this.rememberTurn(chatJid, displayName(last), lastText, reply);
     } catch (err) {
       log.warn({ err }, 'AI reply failed; staying quiet');
     }
