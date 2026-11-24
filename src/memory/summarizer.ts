@@ -54,7 +54,7 @@ export async function aiSummarize(
         'Ringkas segmen chat grup gaming dalam 1-2 kalimat santai bahasa Indonesia. ' +
         'Sebutkan topik utama dan apa yang diputuskan/diulang orang. Maksimal 30 kata, tanpa sapaan.',
       messages: [{ role: 'user', content: body }],
-      maxTokens: 120,
+      maxTokens: 320,
     });
     const text = result.text.trim();
     return text.length > 0 ? text : heuristicSummary(msgs);

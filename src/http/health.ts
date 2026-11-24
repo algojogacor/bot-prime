@@ -6,6 +6,8 @@ const log = childLogger({ mod: 'http' });
 export type HealthDeps = {
   /** True only when the bot can actually do its job (DB reachable + WhatsApp connected). */
   isReady: () => boolean;
+  /** Optional live DB probe; when provided, /readyz also requires a healthy DB. */
+  pingDb?: () => Promise<boolean>;
 };
 
 export type HealthServer = {
@@ -18,7 +20,7 @@ export type HealthServer = {
  * on WhatsApp), /readyz gates traffic on real readiness.
  */
 export function startHealthServer(deps: HealthDeps, port: number): Promise<HealthServer> {
-  const server = http.createServer((req, res) => {
+  const server = http.createServer(async (req, res) => {
     const url = req.url ?? '/';
     res.setHeader('content-type', 'application/json');
     if (url === '/healthz') {
@@ -27,7 +29,9 @@ export function startHealthServer(deps: HealthDeps, port: number): Promise<Healt
       return;
     }
     if (url === '/readyz') {
-      const ready = deps.isReady();
+      const socketReady = deps.isReady();
+      const dbOk = deps.pingDb ? await deps.pingDb() : true;
+      const ready = socketReady && dbOk;
       res.writeHead(ready ? 200 : 503);
       res.end(JSON.stringify({ ready }));
       return;
@@ -39,9 +43,11 @@ export function startHealthServer(deps: HealthDeps, port: number): Promise<Healt
   return new Promise((resolve, reject) => {
     server.once('error', reject);
     server.listen(port, () => {
-      log.info({ port }, 'health server listening');
+      // port 0 = OS-assigned; report the actual bound port.
+      const bound = (server.address() as { port?: number } | null)?.port ?? port;
+      log.info({ port: bound }, 'health server listening');
       resolve({
-        port,
+        port: bound,
         close: () => server.close(),
       });
     });

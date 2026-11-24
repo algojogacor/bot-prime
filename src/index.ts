@@ -83,7 +83,22 @@ async function main(): Promise<void> {
   scheduler.start();
 
   await wa.start();
-  const health = await startHealthServer({ isReady: () => wa.isReady() }, env.PORT);
+  const health = await startHealthServer(
+    {
+      isReady: () => wa.isReady(),
+      // A live DB probe backs /readyz: a connected socket with a dead database
+      // is not ready to process bursts.
+      pingDb: async () => {
+        try {
+          await db.execute('SELECT 1');
+          return true;
+        } catch {
+          return false;
+        }
+      },
+    },
+    env.PORT,
+  );
 
   const shutdown = async (signal: string): Promise<void> => {
     log.info({ signal }, 'shutting down');

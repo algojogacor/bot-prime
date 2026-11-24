@@ -45,14 +45,15 @@ describe('shouldReply', () => {
     expect(d).toEqual({ act: 'ignore', reason: 'daily-ai-quota' });
   });
 
-  it('respects the hourly limit and reply gap', () => {
-    const burst = [{ sender: 'u', text: 'omak', isFromMe: false }];
+  it('respects the hourly limit and the reply gap (ambient text only)', () => {
+    const burst = [{ sender: 'u', text: 'wkwk kocak', isFromMe: false }];
     expect(
       shouldReply({
         burst,
         state: { ...BASE_STATE, repliesLastHour: 12 },
         config: BASE_CONFIG,
         now,
+        rng: () => 0,
       }).reason,
     ).toBe('hourly-limit');
     expect(
@@ -61,8 +62,31 @@ describe('shouldReply', () => {
         state: { ...BASE_STATE, lastReplyAtMs: now - 1_000 },
         config: BASE_CONFIG,
         now,
+        rng: () => 0,
       }).reason,
     ).toBe('reply-gap');
+  });
+
+  it('a direct mention is never dropped by the reply gap (dry-run C07 regression)', () => {
+    const d = shouldReply({
+      burst: [{ sender: 'u', text: 'omak', isFromMe: false }],
+      state: { ...BASE_STATE, lastReplyAtMs: now - 1_000 },
+      config: BASE_CONFIG,
+      now,
+    });
+    expect(d).toEqual({ act: 'reply', reason: 'mentioned' });
+  });
+
+  it('mention tokens match on word boundaries only (dry-run S11 regression)', () => {
+    const d = shouldReply({
+      burst: [{ sender: 'u', text: 'pesan biasa nomor 3', isFromMe: false }],
+      state: BASE_STATE,
+      config: BASE_CONFIG,
+      now,
+      rng: () => 0.99, // ambient must not rescue the false mention
+    });
+    expect(d.act).toBe('ignore');
+    expect(d.reason).toBe('ambient-not-selected');
   });
 
   it('uses the ambient rate only as a low-probability fallback', () => {

@@ -24,13 +24,19 @@ beforeEach(async () => {
 });
 
 describe('messages repo', () => {
-  it('inserts and lists newest-first, ignoring duplicate ids', async () => {
+  it('inserts newest-first; duplicate ids are rejected (durable dedupe contract)', async () => {
     const base = 1_700_000_000_000;
     await insertMessages(db, [
       { id: 'm1', chatJid: 'g@s.whatsapp.net', senderJid: 'a@lid', msgType: 'conversation', text: 'halo', isFromMe: false, timestamp: base },
       { id: 'm2', chatJid: 'g@s.whatsapp.net', senderJid: 'b@lid', msgType: 'conversation', text: 'wkwk', isFromMe: false, timestamp: base + 1000 },
-      { id: 'm1', chatJid: 'g@s.whatsapp.net', senderJid: 'a@lid', msgType: 'conversation', text: 'dupe', isFromMe: false, timestamp: base },
     ]);
+    // Re-inserting an existing id now throws DuplicateMessageError (the
+    // whatsapp service suppresses duplicate processing on this signal).
+    await expect(
+      insertMessages(db, [
+        { id: 'm1', chatJid: 'g@s.whatsapp.net', senderJid: 'a@lid', msgType: 'conversation', text: 'dupe', isFromMe: false, timestamp: base },
+      ]),
+    ).rejects.toThrow(/duplicate/);
     const rows = await listRecentMessages(db, 'g@s.whatsapp.net', 10);
     expect(rows).toHaveLength(2);
     expect(rows[0]?.id).toBe('m2');

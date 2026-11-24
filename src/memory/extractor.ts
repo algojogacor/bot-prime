@@ -34,7 +34,7 @@ export function heuristicExtract(items: { id: string; text: string }[]): Extract
     const birthday = text.match(/(?:ultah|ulang tahun|birthday)\D{0,12}(\d{1,2}[\/\- ]\w{3,9}|\d{1,2}\/\d{1,2})/i);
     if (birthday?.[1]) add('fact', `Ultah: ${birthday[1].trim()} (dari chat)`, 4, item.id);
 
-    const uid = text.match(/\buid\b\D{0,4}(\d{6,12})/i);
+    const uid = text.match(/\buid\b\D{0,10}(\d{6,12})/i);
     if (uid?.[1]) add('fact', `UID: ${uid[1]}`, 3, item.id);
 
     const nickname = text.match(/panggil aja\s+([\w.]{2,20})/i);

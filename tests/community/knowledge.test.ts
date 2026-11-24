@@ -91,6 +91,18 @@ describe('CommunityKnowledge — real committed dataset', () => {
     expect(ctx.block).toBeNull();
     expect(ctx.hits).toHaveLength(0);
   });
+
+  it('general-knowledge questions pull no archive noise (dry-run C08 regression)', () => {
+    const ctx = knowledge.buildContext('Apa perbedaan HTTP dan HTTPS?');
+    expect(ctx.block).toBeNull();
+    const ctx2 = knowledge.buildContext('Explain what a database index does');
+    expect(ctx2.block).toBeNull();
+    // Community-relevant queries still pass the gate.
+    const ctx3 = knowledge.buildContext('mandul');
+    expect(ctx3.block).not.toBeNull();
+    const ctx4 = knowledge.buildContext('gb prime');
+    expect(ctx4.block).not.toBeNull();
+  });
 });
 
 describe('CommunityKnowledge — fallback paths', () => {
