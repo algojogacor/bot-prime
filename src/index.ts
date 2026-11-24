@@ -3,7 +3,7 @@ import { childLogger } from './logger.js';
 import { createDb } from './db/client.js';
 import { runMigrations } from './db/migrate.js';
 import { AIRouter } from './ai/router.js';
-import { buildProviders } from './ai/factory.js';
+import { buildProviders } from './ai/router.js';
 import { recordUsage } from './ai/usage.js';
 import { ShortTermStore } from './memory/short-term.js';
 import { WhatsAppService } from './whatsapp/service.js';

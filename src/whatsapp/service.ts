@@ -19,6 +19,7 @@ import {
 } from '../db/repos/groups.js';
 import { useDbAuthState, clearAuthStore } from '../db/auth-store.js';
 import { BurstCollector } from './burst.js';
+import { splitIntoBubbles } from './bubbles.js';
 import { MessageDeduper } from './dedupe.js';
 import { normalizeMessage } from './normalize.js';
 import type { NormalizedMessage } from './normalize.js';
@@ -130,13 +131,43 @@ export class WhatsAppService {
   async sendText(jid: string, text: string, typingMs?: number): Promise<void> {
     const sock = this.sock;
     if (!sock || this.status !== 'connected') throw new Error('WhatsApp not connected');
-    const pause = typingMs ?? Math.min(2_500, 300 + text.length * 25);
-    if (pause > 0) {
-      await sock.sendPresenceUpdate('composing', jid);
-      await sleep(pause);
+    // Long answers are split at paragraph/sentence boundaries into ordered
+    // bubbles — nothing is cut, and the group sees them arrive in order.
+    const bubbles = splitIntoBubbles(text);
+    for (let i = 0; i < bubbles.length; i++) {
+      const bubble = bubbles[i] as string;
+      const isLast = i === bubbles.length - 1;
+      const pause = typingMs ?? Math.min(2_500, 300 + bubble.length * 12);
+      if (pause > 0) {
+        await sock.sendPresenceUpdate('composing', jid);
+        await sleep(pause);
+      }
+      const sent = await sock.sendMessage(jid, { text: bubble });
+      log.info({ jid, length: bubble.length, bubble: i + 1, of: bubbles.length }, 'text sent');
+      // Persist our own outbound message so reply-to-me detection and the
+      // conversation history stay complete (previous gap: only 2/510 rows).
+      const id = sent?.key?.id;
+      if (id) {
+        void insertMessages(this.opts.db, [
+          {
+            id,
+            chatJid: jid,
+            senderJid: this.sock?.user?.id ?? 'me',
+            text: bubble,
+            msgType: 'text',
+            isFromMe: true,
+            timestamp: Date.now(),
+          },
+        ]).catch((err: unknown) => {
+          // A redelivered echo may race with messages.upsert — duplicates are
+          // expected and harmless; anything else is logged, never thrown.
+          if (!(err instanceof DuplicateMessageError)) {
+            log.warn({ err }, 'self-message persist failed');
+          }
+        });
+      }
+      if (!isLast) await sleep(400);
     }
-    await sock.sendMessage(jid, { text });
-    log.info({ jid, length: text.length }, 'text sent');
   }
 
   /** Send a sticker (WEBP bytes). */

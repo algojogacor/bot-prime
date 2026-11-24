@@ -1,5 +1,6 @@
 import type { Client } from '@libsql/client';
 import { env } from '../config/env.js';
+import { describeProviders } from '../ai/router.js';
 import { getDailyCalls } from '../ai/usage.js';
 import { listMemories } from '../db/repos/memories.js';
 import { deleteSticker, listStickers } from '../db/repos/stickers.js';
@@ -16,7 +17,7 @@ import type { CommunityKnowledge } from '../community/knowledge.js';
 import { downloadMediaBuffer } from '../whatsapp/media.js';
 import type { WhatsAppService } from '../whatsapp/service.js';
 import { addStickerFromImage } from '../stickers/manager.js';
-import type { CommandRegistry } from './registry.js';
+import type { CommandHandler, CommandRegistry } from './registry.js';
 
 export type BuiltinDeps = {
   db: Client;
@@ -37,7 +38,7 @@ export function registerBuiltinCommands(registry: CommandRegistry, deps: Builtin
   registry.register('help', {
     run: async ({ reply }) =>
       reply(
-        '!ping, !stats, !ai <tanya>, !ai lore [topik], !ai status, !ai ejek <nama>, ' +
+        '!ping, !stats, !ai/!omak <tanya>, !ai lore [topik], !ai status, !ai ejek <nama>, ' +
           '!sticker add/list/del, !memory list/del, !prime mode|pause|resume|config (admin)',
       ),
   });
@@ -116,21 +117,24 @@ export function registerBuiltinCommands(registry: CommandRegistry, deps: Builtin
   });
 
   // !ai <tanya> | !ai lore [topik] | !ai status | !ai ejek <nama> | !ai help
-  registry.register('ai', {
+  const handleAiCommand: CommandHandler = {
     run: async ({ args, chatJid, senderName, reply }) => {
       const sub = args[0]?.toLowerCase();
       const rest = args.slice(1).join(' ').trim();
 
       if (!sub || sub === 'help') {
         await reply(
-          '!ai <pertanyaan> (tanya apa aja)\n!ai lore [topik] (cerita lore grup)\n!ai status (info dataset)\n!ai ejek <nama> (roast pendek, grounded)',
+          '!ai/!omak <pertanyaan> (tanya apa aja)\n!ai lore [topik] (cerita lore grup)\n!ai status (info dataset + provider)\n!ai ejek <nama> (roast pendek, grounded)',
         );
         return;
       }
 
       if (sub === 'status') {
         const calls = await getDailyCalls(deps.db).catch(() => 0);
-        await reply(`${deps.knowledge?.digest() ?? 'arsip komunitas ga aktif 🗿'} | ai hari ini ${calls}x`);
+        const providers = deps.router ? describeProviders(deps.router.providersRef()) : 'ai off';
+        await reply(
+          `${deps.knowledge?.digest() ?? 'arsip komunitas ga aktif 🗿'} | ai hari ini ${calls}x | provider: ${providers}`,
+        );
         return;
       }
 
@@ -245,7 +249,7 @@ export function registerBuiltinCommands(registry: CommandRegistry, deps: Builtin
               community: communityBlock ?? undefined,
             }) + `\n\n## Roast rules\n${ROAST_GUIDELINES}`,
           messages: [{ role: 'user', content: rest }],
-          maxTokens: Math.min(800, env.AI_MAX_OUTPUT_TOKENS * 2),
+          maxTokens: env.AI_MAX_OUTPUT_TOKENS,
           temperature: 1,
         });
         const validation = validateReply(result.text);
@@ -261,7 +265,11 @@ export function registerBuiltinCommands(registry: CommandRegistry, deps: Builtin
         await reply('ai lagi macet, coba lagi nnti 🗿');
       }
     },
-  });
+  };
+
+  // Both names route to the same handler: !ai (legacy) and !omak (Bot Prime's own alias).
+  registry.register('ai', handleAiCommand);
+  registry.register('omak', handleAiCommand);
 
   // !prime mode|pause|resume|config — admin-only, persisted per group.
   registry.register('prime', {
