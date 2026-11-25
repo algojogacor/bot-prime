@@ -123,7 +123,7 @@ describe('SocialOrchestrator', () => {
       name: 'fake',
       model: 'fake-model',
       generate: async (req: GenerateRequest) => {
-        systems.push(req.system);
+        systems.push(req.system ?? '');
         return { text: 'gas dah wkwk', provider: 'fake', model: 'fake-model' };
       },
     };
