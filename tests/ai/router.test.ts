@@ -42,4 +42,53 @@ describe('AIRouter', () => {
       /all providers failed — a:.*b:/s,
     );
   });
+
+  it('retries ONE time on a transient error, then succeeds on the same provider (Gojiha policy)', async () => {
+    let calls = 0;
+    const flaky: AIProvider = {
+      name: 'a',
+      model: 'm',
+      generate: async () => {
+        calls += 1;
+        if (calls === 1) throw new AIProviderError('a', 'transient boom');
+        return { text: 'sembuh', provider: 'a', model: 'm' };
+      },
+    };
+    // retryBackoffMs=0 keeps the test instant; policy shape is what matters.
+    const router = new AIRouter([flaky], undefined, 3, 60_000, 1, 0);
+    const res = await router.generate({ messages: [{ role: 'user', content: 'x' }] });
+    expect(res.provider).toBe('a');
+    expect(calls).toBe(2); // initial + exactly one retry
+  });
+
+  it('never retries a fatal (auth) failure — fails over immediately', async () => {
+    let badCalls = 0;
+    const bad: AIProvider = {
+      name: 'a',
+      model: 'm',
+      generate: async () => {
+        badCalls += 1;
+        throw new AIProviderError('a', 'HTTP 401: bad key', 401, true);
+      },
+    };
+    const router = new AIRouter([bad, fakeProvider('b', 'ok')], undefined, 3, 60_000, 1, 0);
+    const res = await router.generate({ messages: [{ role: 'user', content: 'x' }] });
+    expect(res.provider).toBe('b');
+    expect(badCalls).toBe(1); // fatal → zero retries
+  });
+
+  it('trips the circuit breaker IMMEDIATELY on a quota-exhausted error', async () => {
+    const quota: AIProvider = {
+      name: 'q',
+      model: 'm',
+      generate: async () => {
+        throw new AIProviderError('q', 'HTTP 429 (quota exhausted)', 429, true);
+      },
+    };
+    const router = new AIRouter([quota, fakeProvider('b', 'ok')], undefined, 3, 60_000, 1, 0);
+    const res = await router.generate({ messages: [{ role: 'user', content: 'x' }] });
+    expect(res.provider).toBe('b');
+    const status = router.providerStatus().find((s) => s.provider === 'q');
+    expect(status?.breaker).toBe('OPEN'); // fatal trips instantly, not after 3 failures
+  });
 });

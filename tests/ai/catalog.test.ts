@@ -8,14 +8,14 @@ describe('model catalog (Gojiha-aligned)', () => {
     }
   });
 
-  it('uses the exact model ids verified from the neighbor adapters', () => {
+  it('uses the exact model ids verified from the neighbor adapters and its production env', () => {
     expect(catalogModel('groq')).toBe('qwen/qwen3.8-27b');
     expect(catalogModel('gemini')).toBe('gemini-3-flash-preview');
-    expect(catalogModel('nvidia')).toBe('nvidia/nemotron-3.5-lightning-30b-a3b');
+    // NVIDIA_MODEL in the neighbor's production env (2026-11-25).
+    expect(catalogModel('nvidia')).toBe('nvidia/nemotron-3.5-super-vl-120b-a12b');
     expect(catalogModel('deepseek')).toBe('deepseek-flash');
     expect(catalogModel('cohere')).toBe('command-a-reasoning-08-2025');
     expect(catalogModel('mistral')).toBe('codestral-latest');
-    expect(catalogModel('nvidia', 'vision')).toBe('nvidia/nemotron-3.5-super-vl-120b-a12b');
     expect(catalogModel('mistral', 'vision')).toBe('ministral-14b-latest');
   });
 
