@@ -44,6 +44,19 @@ describe('messages repo', () => {
     expect(rows[1]?.senderPn).toBeUndefined();
   });
 
+  it('round-trips push_name so DB history renders display names', async () => {
+    const base = 1_700_000_000_000;
+    await insertMessages(db, [
+      { id: 'p1', chatJid: 'g', senderJid: 'a@lid', msgType: 'conversation', text: 'halo', isFromMe: false, timestamp: base, pushName: 'Ciboy' },
+      { id: 'p2', chatJid: 'g', senderJid: 'b@lid', msgType: 'conversation', text: 'wkwk', isFromMe: false, timestamp: base + 1000 },
+    ]);
+    const rows = await listRecentMessages(db, 'g', 10);
+    const withName = rows.find((r) => r.id === 'p1');
+    expect(withName?.pushName).toBe('Ciboy');
+    const withoutName = rows.find((r) => r.id === 'p2');
+    expect(withoutName?.pushName).toBeUndefined();
+  });
+
   it('prunes by cutoff and reports the affected row count', async () => {
     const base = 1_700_000_000_000;
     await insertMessages(db, [

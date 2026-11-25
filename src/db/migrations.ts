@@ -163,4 +163,15 @@ export const MIGRATIONS: Migration[] = [
       )`,
     ],
   },
+  {
+    version: 7,
+    name: 'messages-push-name',
+    up: [
+      // WhatsApp display names persisted alongside messages so DB-backed
+      // conversation history renders "Ciboy" instead of a 15-digit LID.
+      // SQLite's ADD COLUMN is metadata-only: instant, no table rewrite,
+      // safe on the 1GB-RAM VM.
+      `ALTER TABLE messages ADD COLUMN push_name TEXT`,
+    ],
+  },
 ];

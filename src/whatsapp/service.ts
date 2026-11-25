@@ -8,6 +8,7 @@ import {
 } from '@whiskeysockets/baileys';
 import type { MessageUpsertType, WAMessage } from '@whiskeysockets/baileys';
 import { env } from '../config/env.js';
+import { isChatAllowed } from '../config/group-filter.js';
 import { childLogger } from '../logger.js';
 import { insertMessages, DuplicateMessageError } from '../db/repos/messages.js';
 import { getMessageById } from '../db/repos/messages.js';
@@ -26,6 +27,7 @@ import type { NormalizedMessage } from './normalize.js';
 import { classifyJidPair, persistJidPair } from './participants.js';
 import { OwnershipLease } from './lease.js';
 import { GatewayClient } from './gateway-client.js';
+import type { GatewayMessageEvent } from './gateway-client.js';
 
 const log = childLogger({ mod: 'whatsapp' });
 const baileysLog = childLogger({ mod: 'baileys' });
@@ -66,7 +68,64 @@ function toStored(m: NormalizedMessage) {
     msgType: m.type,
     isFromMe: m.isFromMe,
     timestamp: m.timestamp,
+    pushName: m.pushName,
   };
+}
+
+/**
+ * Gateway events carry Baileys' messageTimestamp in SECONDS (the gateway
+ * forwards it verbatim); some fallback paths produce milliseconds instead.
+ * normalizeMessage multiplies by 1000, so this layer must always pass
+ * SECONDS. Observed live as the "1970 timestamps" bug: every inbound message
+ * was persisted with a garbage epoch, never surfaced in time-ordered
+ * history, and was purged by the daily retention pass as ancient.
+ */
+function gatewayTsToSeconds(ts: number): number {
+  return ts >= 1e12 ? Math.floor(ts / 1000) : Math.floor(ts);
+}
+
+type GatewayRawKey = {
+  remoteJid?: string;
+  remoteJidAlt?: string;
+  fromMe?: boolean;
+  id?: string;
+  participant?: string;
+  participantAlt?: string;
+};
+
+/**
+ * Rebuild a WAMessage from a gateway `msg` event. Fidelity matters — the
+ * previous adapter rebuilt a bare key and dropped everything else:
+ *  - `raw.key` (when present) keeps participantAlt/remoteJidAlt, the PN↔LID
+ *    alternates the normalizer needs for sender identity (sender_pn);
+ *  - pushName is mapped so history renders names instead of 15-digit LIDs;
+ *  - the timestamp unit is normalized (see gatewayTsToSeconds).
+ */
+export function gatewayEventToWAMessage(ev: GatewayMessageEvent): WAMessage {
+  const rawKey = (ev.raw?.key ?? undefined) as GatewayRawKey | undefined;
+  const fallbackKey = {
+    remoteJid: ev.from,
+    fromMe: ev.fromMe,
+    id: ev.id,
+    participant: ev.isGroup ? ev.sender : undefined,
+  };
+  const message =
+    ev.text !== undefined
+      ? ((ev.raw?.message as object | undefined) ?? { conversation: ev.text })
+      : (ev.raw?.message as object | undefined);
+  const rawPush = (ev.raw as { pushName?: unknown } | undefined)?.pushName;
+  const pushName =
+    typeof ev.pushName === 'string' && ev.pushName.length > 0
+      ? ev.pushName
+      : typeof rawPush === 'string' && rawPush.length > 0
+        ? rawPush
+        : undefined;
+  return {
+    key: { ...fallbackKey, ...(rawKey ?? {}) },
+    message,
+    messageTimestamp: gatewayTsToSeconds(ev.ts),
+    pushName,
+  } as WAMessage;
 }
 
 /** Persist PN↔LID pairs the moment we observe them; Baileys cannot reverse-resolve later. */
@@ -87,10 +146,18 @@ export class WhatsAppService {
   private gateway: GatewayClient | null = null;
   private reconnectDelayMs = 2_000;
   private pairingRequested = false;
+  /**
+   * Our own JID as learned from gateway echoes. In gateway mode this.sock is
+   * null, so Baileys' user.id is unavailable — without it mention detection
+   * (mentionsMe) silently never fired.
+   */
+  private gatewaySelfJid: string | null = null;
   private readonly deduper = new MessageDeduper();
   private readonly rawRecent = new Map<string, WAMessage[]>();
   private readonly collector: BurstCollector<NormalizedMessage>;
   private readonly lease: OwnershipLease;
+  /** Chats already reported as filtered this process (log noise bound). */
+  private readonly filterLogged = new Set<string>();
 
   constructor(private readonly opts: WhatsAppServiceOptions) {
     this.collector = new BurstCollector<NormalizedMessage>(
@@ -101,6 +168,10 @@ export class WhatsAppService {
   }
 
   isReady(): boolean {
+    // Gateway transport: readiness is the gateway's WhatsApp status (sock is
+    // always null there — the old `sock !== null` check made /health report
+    // 'starting' forever in gateway mode).
+    if (this.gateway) return this.status === 'connected';
     return this.status === 'connected' && this.sock !== null;
   }
 
@@ -254,20 +325,19 @@ export class WhatsAppService {
     });
 
     gw.on('message', (ev) => {
+      // Learn our own JID from any fromMe event: group echoes carry it as
+      // `participant`, DM echoes as the chat address. Needed for
+      // mentionsMe; see the gatewaySelfJid field note.
+      if (ev.fromMe && this.gatewaySelfJid === null) {
+        const self = ev.isGroup ? ev.sender : ev.from;
+        if (self && !self.endsWith('@broadcast')) {
+          this.gatewaySelfJid = self;
+          log.info({ selfJid: self }, 'self jid learned from gateway echo');
+        }
+      }
       // Build a WAMessage-shaped object from the gateway event so the
       // existing normalizer/dedupe/persist path runs unchanged.
-      const waMsg = {
-        key: {
-          remoteJid: ev.from,
-          fromMe: ev.fromMe,
-          id: ev.id,
-          participant: ev.isGroup ? ev.sender : undefined,
-        },
-        message: ev.text !== undefined
-          ? (ev.raw?.message as object | undefined) ?? { conversation: ev.text }
-          : (ev.raw?.message as object | undefined),
-        messageTimestamp: Math.floor(ev.ts / 1000),
-      } as WAMessage;
+      const waMsg = gatewayEventToWAMessage(ev);
       void this.onUpsert({ messages: [waMsg], type: 'notify' } as Upsert);
     });
 
@@ -456,11 +526,25 @@ export class WhatsAppService {
     if (upsert.type === 'append') {
       return;
     }
-    const selfJid = this.sock?.user?.id;
+    const selfJid = this.sock?.user?.id ?? this.gatewaySelfJid ?? undefined;
     const batch: NormalizedMessage[] = [];
     for (const waMsg of upsert.messages as WAMessage[]) {
       const norm = normalizeMessage(waMsg);
       if (!norm || norm.type === 'protocolMessage') continue;
+      // Allow-list gate — the FIRST check in the pipeline: groups not on
+      // OMAK_ALLOWED_GROUP_JIDS are dropped before dedupe, persistence,
+      // burst collection, commands or ANY AI/provider call. DMs and other
+      // non-group chats always pass (personal usage keeps working).
+      if (!isChatAllowed(norm.chatJid)) {
+        if (!this.filterLogged.has(norm.chatJid)) {
+          this.filterLogged.add(norm.chatJid);
+          log.info(
+            { chatJid: norm.chatJid },
+            'group not on allow-list; dropping all messages from this chat',
+          );
+        }
+        continue;
+      }
       if (this.deduper.check(norm.id)) continue;
       if (selfJid && norm.mentionedJids?.length) {
         norm.mentionsMe = norm.mentionedJids.some((j) => sameJidUser(j, selfJid));

@@ -18,6 +18,9 @@ const log = childLogger({ mod: 'wa:gateway-client' });
 export type GatewayMessageEvent = {
   t: 'msg';
   id: string;
+  /** Epoch — SECONDS when the gateway forwards Baileys' messageTimestamp
+   * verbatim (its documented behavior), milliseconds on the fallback path.
+   * Consumers must normalize the unit before use. */
   ts: number;
   from: string;
   sender: string;
@@ -25,7 +28,9 @@ export type GatewayMessageEvent = {
   fromMe: boolean;
   text?: string;
   quoted?: { id: string; text?: string };
-  raw?: { key: unknown; message: unknown };
+  /** WhatsApp display name of the sender (mapped to WAMessage.pushName). */
+  pushName?: string;
+  raw?: { key?: unknown; message?: unknown; pushName?: unknown };
 };
 
 export type GatewayStatusEvent = {

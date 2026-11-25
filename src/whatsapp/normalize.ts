@@ -29,29 +29,54 @@ export function unwrapMessage(
   return current;
 }
 
+/**
+ * Strip control characters that corrupt storage or downstream matching
+ * (observed live: a trailing NUL byte persisted into messages.text).
+ * Kept: \n (paragraph structure) and \t. Also strips the C1 range, which
+ * some providers emit inside otherwise-valid UTF-8.
+ */
+export function stripControlChars(text: string): string {
+  return text.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F]/g, '');
+}
+
 /** Pull displayable text out of an already-unwrapped message, with its Baileys type. */
 export function extractContent(
   message: proto.IMessage,
 ): { type: string; text: string | null } {
-  if (message.conversation != null) return { type: 'conversation', text: message.conversation };
+  if (message.conversation != null) {
+    return { type: 'conversation', text: stripControlChars(message.conversation) };
+  }
   const extended = message.extendedTextMessage;
-  if (extended?.text != null) return { type: 'extendedTextMessage', text: extended.text };
+  if (extended?.text != null) {
+    return { type: 'extendedTextMessage', text: stripControlChars(extended.text) };
+  }
   if (message.imageMessage)
-    return { type: 'imageMessage', text: message.imageMessage.caption ?? null };
+    return {
+      type: 'imageMessage',
+      text: message.imageMessage.caption ? stripControlChars(message.imageMessage.caption) : null,
+    };
   if (message.videoMessage)
-    return { type: 'videoMessage', text: message.videoMessage.caption ?? null };
+    return {
+      type: 'videoMessage',
+      text: message.videoMessage.caption ? stripControlChars(message.videoMessage.caption) : null,
+    };
   if (message.documentMessage)
-    return { type: 'documentMessage', text: message.documentMessage.caption ?? null };
+    return {
+      type: 'documentMessage',
+      text: message.documentMessage.caption
+        ? stripControlChars(message.documentMessage.caption)
+        : null,
+    };
   if (message.stickerMessage) return { type: 'stickerMessage', text: null };
   if (message.audioMessage) return { type: 'audioMessage', text: null };
   if (message.buttonsResponseMessage?.selectedDisplayText != null) {
     return {
       type: 'buttonsResponseMessage',
-      text: message.buttonsResponseMessage.selectedDisplayText,
+      text: stripControlChars(message.buttonsResponseMessage.selectedDisplayText),
     };
   }
   if (message.listResponseMessage?.title != null) {
-    return { type: 'listResponseMessage', text: message.listResponseMessage.title };
+    return { type: 'listResponseMessage', text: stripControlChars(message.listResponseMessage.title) };
   }
   if (message.reactionMessage) {
     return { type: 'reactionMessage', text: message.reactionMessage.text ?? null };
