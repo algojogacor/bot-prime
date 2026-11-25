@@ -50,6 +50,10 @@ echo "== 4. swap code into live dir =="
 rsync -a --delete "$SRC/dist/" "$LIVE/dist/"
 rsync -a --delete "$SRC/src/" "$LIVE/src/"
 rsync -a --delete "$SRC/tests/" "$LIVE/tests/"
+# ops/ is copied INTO scripts/ (no --delete): the live scripts/ dir also holds
+# VM-only tooling (dry-run suite) that is not part of the repo.
+mkdir -p "$LIVE/scripts/ops"
+rsync -a "$SRC/scripts/ops/" "$LIVE/scripts/ops/"
 cp -a "$SRC/package.json" "$LIVE/package.json"
 cp -a "$SRC/tsconfig.json" "$SRC/tsconfig.build.json" "$SRC/vitest.config.ts" "$LIVE/"
 cp -a "$SRC/eslint.config.js" "$LIVE/"
