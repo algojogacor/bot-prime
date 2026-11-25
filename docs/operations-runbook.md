@@ -4,6 +4,21 @@ Day-2 operations for the WhatsApp bot: startup, pairing, modes, dataset
 maintenance, database care, and troubleshooting. Deployment steps live in
 [deploy-koyeb.md](deploy-koyeb.md); Turso setup in [deploy-turso.md](deploy-turso.md).
 
+## 0. Deploy on the Azure VM (GitHub-first)
+
+1. Branch, commit, push; open a PR; let CI (or, when the GitHub account's
+   Actions are locked, the equivalent local gate: `tsc --noEmit`,
+   `eslint .`, `vitest run`, `tsc -p tsconfig.build.json`) pass; merge.
+2. On the VM, from a clone with `origin` set:
+   `bash scripts/ops/deploy-from-github.sh <full-merged-sha>` — it verifies
+   the SHA equals `origin/main`, builds, backs up the live deploy (dist,
+   bot.db, .env, package.json) into `bot-prime-backups/`, swaps the code,
+   repairs any mis-stamped timestamps, and restarts PM2.
+3. Verify: `/healthz` and `/readyz` on the health port, `pm2 logs bot-prime`
+   (migration applied, gateway connected), `DEPLOYED_SHA` == the merged SHA.
+4. Optional AI-path smoke test without touching WhatsApp:
+   `scripts/ops/e2e-check.ts` against a COPY of bot.db.
+
 ## 1. Start / stop
 
 ```bash
