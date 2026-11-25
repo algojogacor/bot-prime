@@ -16,8 +16,15 @@ maintenance, database care, and troubleshooting. Deployment steps live in
    repairs any mis-stamped timestamps, and restarts PM2.
 3. Verify: `/healthz` and `/readyz` on the health port, `pm2 logs bot-prime`
    (migration applied, gateway connected), `DEPLOYED_SHA` == the merged SHA.
-4. Optional AI-path smoke test without touching WhatsApp:
-   `scripts/ops/e2e-check.ts` against a COPY of bot.db.
+4. Optional AI-path smoke tests without touching WhatsApp:
+   - `scripts/ops/e2e-check.ts` — full orchestrator reply path (against a
+     COPY of bot.db).
+   - `scripts/ops/provider-e2e.ts` — direct generate() against every
+     configured provider with the real key pools, plus a failover drill
+     (simulated dead groq+gemini must be answered by nvidia). NOTE: a
+     provider can legitimately fail its direct test when ITS quota is
+     exhausted at that moment (the shared Gemini key does this) — the drill
+     is what proves the chain still answers.
 
 ## 1. Start / stop
 
