@@ -11,8 +11,10 @@ describe('model catalog (Gojiha-aligned)', () => {
   it('uses the exact model ids verified from the neighbor adapters and its production env', () => {
     expect(catalogModel('groq')).toBe('qwen/qwen3.8-27b');
     expect(catalogModel('gemini')).toBe('gemini-3-flash-preview');
-    // NVIDIA_MODEL in the neighbor's production env (2026-11-25).
-    expect(catalogModel('nvidia')).toBe('nvidia/nemotron-3.5-super-vl-120b-a12b');
+    // NVIDIA_TEXT_MODEL / NVIDIA_VISION_MODEL in the neighbor's production
+    // env (2026-11-25) — its text path reads NVIDIA_TEXT_MODEL, not NVIDIA_MODEL.
+    expect(catalogModel('nvidia')).toBe('nvidia/nemotron-3-ultra-550b-a55b');
+    expect(catalogModel('nvidia', 'vision')).toBe('nvidia/nemotron-3.5-super-vl-120b-a12b');
     expect(catalogModel('deepseek')).toBe('deepseek-flash');
     expect(catalogModel('cohere')).toBe('command-a-reasoning-08-2025');
     expect(catalogModel('mistral')).toBe('codestral-latest');
