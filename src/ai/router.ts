@@ -1,7 +1,8 @@
 import { env, parseList } from '../config/env.js';
 import { childLogger } from '../logger.js';
-import { AIProviderError } from './types.js';
+import { AIProviderError, isFatalProviderError } from './types.js';
 import type { AIProvider, GenerateRequest, GenerateResult } from './types.js';
+import { sleep } from '../util/sleep.js';
 import { MultiProviderAdapter } from './adapters/multi-provider.js';
 import { AnthropicProvider } from './adapters/anthropic.js';
 import { GeminiProvider } from './adapters/gemini.js';
@@ -22,14 +23,14 @@ type BreakerEntry = { state: CircuitBreakerState; failures: number; openedAt: nu
 
 /**
  * Provider chain aligned with the Gojiha Flash Peak ecosystem (verified from
- * its source on 2026-11-24): same seven practical providers, same chat
- * priority order (GROQ → GEMINI → NVIDIA_NIM → MISTRAL → DEEPSEEK → COHERE →
- * OLLAMA), circuit breaker (3 consecutive failures → OPEN, 60 s cooldown,
- * HALF_OPEN probe), key-pool rotation on 401/403/429, then failover to the
- * next provider. Bot Prime uses only its OWN env credentials; providers
- * without an authorized Bot Prime key are never routed to (they stay visible
- * in the catalog/status as 'no credential' instead of being silently
- * substituted with another model).
+ * its source on 2026-11-24, fallback logic re-verified 2026-11-25): same
+ * practical providers, same chat priority order (GROQ → GEMINI → NVIDIA_NIM →
+ * MISTRAL → DEEPSEEK → COHERE → OLLAMA — Gojiha's CHAT task order), circuit
+ * breaker (3 consecutive failures → OPEN, 60 s cooldown, HALF_OPEN probe;
+ * auth/quota/safety trip immediately), key-pool rotation on 401/403/429 (up
+ * to 5 keys walked per request), ONE retry per provider with 200 ms
+ * exponential backoff on transient errors, then failover to the next
+ * provider. Bot Prime routes only to providers with a configured credential.
  */
 export class AIRouter {
   private readonly breakers = new Map<string, BreakerEntry>();
@@ -39,6 +40,9 @@ export class AIRouter {
     private readonly onUsage?: (record: UsageRecord) => void,
     private readonly breakerThreshold = 3,
     private readonly cooldownMs = 60_000,
+    /** Gojiha-replicated per-provider retry: 1 retry, 200 ms initial backoff. */
+    private readonly maxRetriesPerProvider = 1,
+    private readonly retryBackoffMs = 200,
   ) {
     for (const p of providers) this.breakers.set(p.name, { state: 'CLOSED', failures: 0, openedAt: 0 });
   }
@@ -78,8 +82,9 @@ export class AIRouter {
     if (!b) return;
     b.failures += 1;
     b.lastError = err instanceof Error ? err.message.slice(0, 140) : String(err).slice(0, 140);
-    const isFatal = err instanceof AIProviderError && (err.status === 401 || err.status === 403);
-    if (isFatal || b.failures >= this.breakerThreshold || b.state === 'HALF_OPEN') {
+    // Gojiha parity: fatal errors (auth, exhausted quota, safety) trip the
+    // breaker immediately instead of waiting for 3 consecutive failures.
+    if (isFatalProviderError(err) || b.failures >= this.breakerThreshold || b.state === 'HALF_OPEN') {
       b.state = 'OPEN';
       b.openedAt = Date.now();
     }
@@ -89,21 +94,32 @@ export class AIRouter {
     const failures: string[] = [];
     for (const provider of this.providers) {
       if (!this.isAvailable(provider.name)) continue;
-      try {
-        const result = await provider.generate(req);
-        this.recordSuccess(provider.name);
-        this.onUsage?.({
-          provider: result.provider,
-          model: result.model,
-          promptTokens: result.usage?.promptTokens,
-          completionTokens: result.usage?.completionTokens,
-        });
-        return result;
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        this.recordFailure(provider.name, err);
-        log.warn({ provider: provider.name, err: message }, 'provider failed; trying next');
-        failures.push(`${provider.name}: ${message}`);
+      // Gojiha-replicated retry policy: up to 1 retry per provider with
+      // exponential backoff (200 ms → 400 ms), halted IMMEDIATELY when the
+      // error is fatal (auth/quota/safety) — those are not transient.
+      for (let attempt = 0; attempt <= this.maxRetriesPerProvider; attempt++) {
+        try {
+          const result = await provider.generate(req);
+          this.recordSuccess(provider.name);
+          this.onUsage?.({
+            provider: result.provider,
+            model: result.model,
+            promptTokens: result.usage?.promptTokens,
+            completionTokens: result.usage?.completionTokens,
+          });
+          return result;
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          this.recordFailure(provider.name, err);
+          if (isFatalProviderError(err) || attempt >= this.maxRetriesPerProvider) {
+            log.warn({ provider: provider.name, err: message }, 'provider failed; trying next');
+            failures.push(`${provider.name}: ${message}`);
+            break;
+          }
+          const backoff = Math.round(this.retryBackoffMs * Math.pow(2, attempt));
+          log.warn({ provider: provider.name, err: message, backoff, attempt }, 'transient provider error; retrying');
+          await sleep(backoff);
+        }
       }
     }
     throw new AIProviderError('router', `all providers failed — ${failures.join(' | ')}`);

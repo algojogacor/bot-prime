@@ -31,12 +31,26 @@ export interface AIProvider {
 }
 
 export class AIProviderError extends Error {
+  /**
+   * fatal=true marks errors that must NOT be retried on this provider and
+   * trip its circuit breaker immediately (auth failure, exhausted quota,
+   * safety rejection) — the same classification the neighboring Gojiha
+   * service uses (AIAuthenticationError / AIQuotaExceededError / AISafetyError).
+   */
   constructor(
     readonly provider: string,
     message: string,
     readonly status?: number,
+    readonly fatal = false,
   ) {
     super(`[${provider}] ${message}`);
     this.name = 'AIProviderError';
   }
+}
+
+/** Auth failures (401/403) are fatal by convention, quota/safety by flag. */
+export function isFatalProviderError(err: unknown): boolean {
+  if (!(err instanceof AIProviderError)) return false;
+  if (err.fatal) return true;
+  return err.status === 401 || err.status === 403;
 }

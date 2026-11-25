@@ -23,7 +23,10 @@ export const MODEL_CATALOG: Record<string, { text: string; vision: string; endpo
   },
   nvidia: {
     label: 'NVIDIA_NIM',
-    text: 'nvidia/nemotron-3.5-lightning-30b-a3b',
+    // Matches the neighboring Gojiha service's production NVIDIA_MODEL
+    // (verified in its .env on 2026-11-25): the lightning entry below was
+    // never actually served there.
+    text: 'nvidia/nemotron-3.5-super-vl-120b-a12b',
     vision: 'nvidia/nemotron-3.5-super-vl-120b-a12b',
     endpoint: 'https://integrate.api.nvidia.com/v1',
   },

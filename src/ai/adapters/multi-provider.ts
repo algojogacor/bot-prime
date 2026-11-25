@@ -67,7 +67,11 @@ function buildMessages(req: GenerateRequest): OAMessage[] {
  *  - Cohere compat: needs max_tokens present (no default omission).
  *  - Groq reasoning models: finish_reason=length with no visible text gets one
  *    bounded retry with a larger budget (reasoning consumed the budget).
- *  - Key pool: rotates keys on 401/403/429 so a dead key never wedges chat.
+ *  - Key pool (Gojiha-replicated policy):
+ *    · 401/403 → rotate key, throw fatal immediately (never retried here).
+ *    · 429 with quota semantics → rotate key, throw fatal (breaker trips).
+ *    · 429 rate limit → rotate key and RETRY with the next key in the pool,
+ *      up to min(pool size, 5) keys per request — a hot key never wedges chat.
  */
 export class MultiProviderAdapter implements AIProvider {
   readonly name: string;
@@ -84,32 +88,26 @@ export class MultiProviderAdapter implements AIProvider {
   }
 
   private get endpoint(): string {
-    return this.cfg.model // explicit model + env base URL path
-      ? (catalogEndpoint(this.cfg.id) as string)
-      : (catalogEndpoint(this.cfg.id) as string);
-  }
-
-  private get activeKey(): string | undefined {
-    const keys = this.cfg.apiKeys.filter(Boolean);
-    if (keys.length === 0) return undefined;
-    return keys[this.keyIndex % keys.length];
-  }
-
-  private rotateKey(): void {
-    this.keyIndex += 1;
+    return (catalogEndpoint(this.cfg.id) as string);
   }
 
   async generate(req: GenerateRequest): Promise<GenerateResult> {
     const isVision = (req.images?.length ?? 0) > 0;
     const model = isVision ? this.visionModel : this.model;
 
-    const key = this.activeKey;
-    if (!key) {
-      throw new AIProviderError(this.name, 'no authorized Bot Prime credential configured for this provider', 401);
+    const keyPool = this.cfg.apiKeys.filter(Boolean);
+    if (keyPool.length === 0) {
+      throw new AIProviderError(this.name, 'no authorized Bot Prime credential configured for this provider', 401, true);
     }
+    // Gojiha's pool-walk bound: at most 5 keys tried per request.
+    const maxKeyAttempts = Math.min(keyPool.length, 5);
 
     let budget = req.maxTokens ?? this.cfg.maxTokensCap; // undefined → provider-native
-    for (let attempt = 0; attempt < 2; attempt++) {
+    let reasoningRetryAvailable = true;
+
+    for (let keyAttempt = 0; keyAttempt < maxKeyAttempts; keyAttempt++) {
+      const key = keyPool[this.keyIndex % keyPool.length] as string;
+
       const body: Record<string, unknown> = {
         model,
         messages: buildMessages(req),
@@ -136,9 +134,29 @@ export class MultiProviderAdapter implements AIProvider {
         throw new AIProviderError(this.name, `request failed: ${String(err)}`);
       }
 
-      if (res.status === 401 || res.status === 403 || res.status === 429) {
-        this.rotateKey();
+      if (res.status === 401 || res.status === 403) {
+        this.keyIndex += 1; // rotate: next request starts on a fresh key
+        const snippet = (await res.text()).slice(0, 300);
+        throw new AIProviderError(this.name, `HTTP ${res.status}: ${snippet}`, res.status, true);
       }
+
+      if (res.status === 429) {
+        this.keyIndex += 1; // rotate regardless — this key is hot either way
+        const snippet = (await res.text()).slice(0, 300);
+        const lower = snippet.toLowerCase();
+        const quota =
+          lower.includes('quota') ||
+          lower.includes('insufficient_quota') ||
+          lower.includes('exceeded your current quota');
+        if (quota) {
+          throw new AIProviderError(this.name, `HTTP 429 (quota exhausted): ${snippet}`, 429, true);
+        }
+        if (keyAttempt < maxKeyAttempts - 1) {
+          continue; // try the next rotated key in the pool
+        }
+        throw new AIProviderError(this.name, `HTTP 429 (rate limited): ${snippet}`, 429);
+      }
+
       if (!res.ok) {
         const snippet = (await res.text()).slice(0, 300);
         throw new AIProviderError(this.name, `HTTP ${res.status}: ${snippet}`, res.status);
@@ -153,11 +171,14 @@ export class MultiProviderAdapter implements AIProvider {
 
       // Reasoning models (e.g. Groq gpt-oss) can burn the whole budget on
       // internal reasoning before emitting visible text: one bounded retry
-      // with the budget raised, capped so generation stays bounded.
+      // with the budget raised, capped so generation stays bounded. Same key,
+      // does not consume a pool slot.
       if (!text && choice?.finish_reason === 'length') {
         const current = typeof body.max_tokens === 'number' ? body.max_tokens : 2048;
-        if (attempt === 0 && current < 4096) {
+        if (reasoningRetryAvailable && current < 4096) {
+          reasoningRetryAvailable = false;
           budget = Math.min(current * 2, 4096);
+          keyAttempt -= 1; // retry this key with the raised budget
           continue;
         }
         throw new AIProviderError(

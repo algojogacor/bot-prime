@@ -99,11 +99,64 @@ describe('MultiProviderAdapter', () => {
       defaultTemperature: 0.7,
       fetchImpl,
     });
-    // First call fails (401 rotates), router would retry — simulate second attempt:
+    // First call fails (401 rotates, fatal — never retried in-request),
+    // the router-level failover / next request starts on key-2:
     await expect(a.generate(baseReq)).rejects.toThrow('HTTP 401');
     const res = await a.generate(baseReq);
     expect(res.text).toBe('dari kunci kedua');
     expect(calls[1]?.auth).toBe('Bearer key-2');
+  });
+
+  it('429 rate limit walks to the NEXT key within the same request (Gojiha policy)', async () => {
+    const { fetchImpl, calls } = makeFetchSequence([
+      { status: 429, json: { error: 'rate limit reached' } },
+      ok('lewat key kedua'),
+    ]);
+    const a = new MultiProviderAdapter({
+      id: 'groq',
+      apiKeys: ['key-1', 'key-2', 'key-3'],
+      timeoutMs: 5_000,
+      defaultTemperature: 0.7,
+      fetchImpl,
+    });
+    const res = await a.generate(baseReq);
+    expect(res.text).toBe('lewat key kedua');
+    expect(calls.length).toBe(2);
+    expect(calls[0]?.auth).toBe('Bearer key-1');
+    expect(calls[1]?.auth).toBe('Bearer key-2'); // rotated, not the same hot key
+  });
+
+  it('429 quota-exhausted is fatal: no in-request key walk, trips the breaker upstream', async () => {
+    const { fetchImpl, calls } = makeFetchSequence([
+      { status: 429, json: { error: 'You exceeded your current quota' } },
+      ok('tidak boleh sampai sini'),
+    ]);
+    const a = new MultiProviderAdapter({
+      id: 'groq',
+      apiKeys: ['key-1', 'key-2'],
+      timeoutMs: 5_000,
+      defaultTemperature: 0.7,
+      fetchImpl,
+    });
+    await expect(a.generate(baseReq)).rejects.toThrow('quota exhausted');
+    expect(calls.length).toBe(1); // fatal — walked nowhere
+  });
+
+  it('429 on the whole pool throws after a bounded walk (max 5 keys, Gojiha bound)', async () => {
+    const rateLimited = { status: 429, json: { error: 'rate limit reached' } };
+    const { fetchImpl, calls } = makeFetchSequence([
+      rateLimited, rateLimited, rateLimited, rateLimited,
+      rateLimited, rateLimited, rateLimited, rateLimited,
+    ]);
+    const a = new MultiProviderAdapter({
+      id: 'cohere',
+      apiKeys: ['k1', 'k2', 'k3', 'k4', 'k5', 'k6', 'k7', 'k8'],
+      timeoutMs: 5_000,
+      defaultTemperature: 0.7,
+      fetchImpl,
+    });
+    await expect(a.generate(baseReq)).rejects.toThrow('HTTP 429');
+    expect(calls.length).toBe(5); // bounded pool walk, not the full pool
   });
 
   it('throws a credential error when no authorized key is configured', async () => {
