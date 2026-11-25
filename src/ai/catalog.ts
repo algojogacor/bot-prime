@@ -3,10 +3,10 @@ export type ProviderId = (typeof providerIds)[number];
 
 /**
  * Model catalog entries mirror the Gojiha Flash Peak ecosystem (verified from
- * its adapters on 2026-11-24): default text/vision models per provider, with
- * per-request model selection supported by MultiProviderRouter.
- * Bot Prime keeps its own ids/names; credentials are read from Bot Prime's
- * own env only — never from the neighboring service.
+ * its adapters and production .env, 2026-11-24/25): text/vision models per
+ * provider. Provider sharing is owner-authorized (2026-11-25): the key pools
+ * are copied from the neighbor's .env into Bot Prime's own env vars — never
+ * committed to the repo.
  */
 export const MODEL_CATALOG: Record<string, { text: string; vision: string; endpoint: string; label: string }> = {
   groq: {
@@ -23,10 +23,11 @@ export const MODEL_CATALOG: Record<string, { text: string; vision: string; endpo
   },
   nvidia: {
     label: 'NVIDIA_NIM',
-    // Matches the neighboring Gojiha service's production NVIDIA_MODEL
-    // (verified in its .env on 2026-11-25): the lightning entry below was
-    // never actually served there.
-    text: 'nvidia/nemotron-3.5-super-vl-120b-a12b',
+    // Matches the neighbor's production env (verified 2026-11-25): text
+    // requests resolve NVIDIA_TEXT_MODEL=ultra-550b, vision resolves
+    // NVIDIA_VISION_MODEL=super-vl. NVIDIA_MODEL there is only a general
+    // default and is never used on the text/vision code paths.
+    text: 'nvidia/nemotron-3-ultra-550b-a55b',
     vision: 'nvidia/nemotron-3.5-super-vl-120b-a12b',
     endpoint: 'https://integrate.api.nvidia.com/v1',
   },
