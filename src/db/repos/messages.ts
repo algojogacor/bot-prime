@@ -5,6 +5,8 @@ export type StoredMessage = {
   chatJid: string;
   senderJid: string;
   senderPn?: string;
+  /** WhatsApp display name (pushName) — kept so history context stays readable. */
+  pushName?: string;
   text?: string;
   msgType: string;
   isFromMe: boolean;
@@ -48,8 +50,8 @@ export async function insertMessagesCounting(
 ): Promise<number> {
   if (msgs.length === 0) return 0;
   const stmts: InStatement[] = msgs.map((m) => ({
-    sql: `INSERT INTO messages (id, chat_jid, sender_jid, sender_pn, text, msg_type, is_from_me, timestamp, created_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    sql: `INSERT INTO messages (id, chat_jid, sender_jid, sender_pn, text, msg_type, is_from_me, timestamp, created_at, push_name)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT (id) DO NOTHING`,
     args: [
       m.id,
@@ -61,6 +63,7 @@ export async function insertMessagesCounting(
       m.isFromMe ? 1 : 0,
       m.timestamp,
       Date.now(),
+      m.pushName ?? null,
     ],
   }));
   const results = await db.batch(stmts, 'write');
@@ -76,7 +79,7 @@ export async function listRecentMessages(
   limit: number,
 ): Promise<StoredMessageRow[]> {
   const res = await db.execute({
-    sql: `SELECT id, chat_jid, sender_jid, sender_pn, text, msg_type, is_from_me, timestamp, created_at
+    sql: `SELECT id, chat_jid, sender_jid, sender_pn, text, msg_type, is_from_me, timestamp, created_at, push_name
           FROM messages WHERE chat_jid = ? ORDER BY timestamp DESC LIMIT ?`,
     args: [chatJid, limit],
   });
@@ -90,6 +93,7 @@ export async function listRecentMessages(
     isFromMe: Number(row.is_from_me) === 1,
     timestamp: Number(row.timestamp),
     createdAt: Number(row.created_at),
+    pushName: row.push_name == null ? undefined : String(row.push_name),
   }));
 }
 

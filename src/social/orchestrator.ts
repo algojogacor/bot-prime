@@ -3,6 +3,7 @@ import { env, parseList } from '../config/env.js';
 import { childLogger } from '../logger.js';
 import type { AIRouter } from '../ai/router.js';
 import { buildSystemPrompt } from '../ai/prompt-builder.js';
+import type { PromptContextMessage } from '../ai/prompt-builder.js';
 import { validateReply } from '../ai/validator.js';
 import { getDailyCalls } from '../ai/usage.js';
 import type { ShortTermStore } from '../memory/short-term.js';
@@ -12,7 +13,7 @@ import { buildMemoryContext } from '../memory/retrieval.js';
 import { getGroupMeta } from '../db/repos/groups.js';
 import { getGroupSettings } from '../db/repos/settings.js';
 import type { GroupSettings } from '../db/repos/settings.js';
-import { getMessageById } from '../db/repos/messages.js';
+import { getMessageById, listRecentMessages } from '../db/repos/messages.js';
 import { shouldReply } from './participation.js';
 import type { ChatReplyState } from './participation.js';
 import { analyzeBurst } from './context-analyzer.js';
@@ -48,8 +49,15 @@ export type OrchestratorDeps = {
 };
 
 function displayName(m: NormalizedMessage): string {
+  if (m.isFromMe) return 'omak';
   if (m.pushName) return m.pushName;
-  return m.senderJid.split('@')[0] ?? m.senderJid;
+  return fallbackName(m.senderJid);
+}
+
+/** Last-resort sender label: no pushName anywhere → short, stable, cheap. */
+function fallbackName(jid: string): string {
+  const digits = jid.split('@')[0] ?? '';
+  return digits ? `user${digits.slice(-4)}` : 'seseorang';
 }
 
 /**
@@ -205,7 +213,12 @@ export class SocialOrchestrator {
     }
 
     // AI reply.
-    const recent = this.deps.shortTerm.recent(chatJid, 20);
+    // Durable conversation history from the DB. The in-RAM ShortTermStore
+    // dies with every restart — before this, a redeploy mid-conversation left
+    // the prompt contextless and the bot answered in a vacuum. The DB is the
+    // source of truth for "who said what"; the RAM store still feeds gap
+    // heuristics, starters and the summarizer.
+    const history = await this.buildHistory(chatJid, burst);
     const memoryBlock = await buildMemoryContext(this.deps.db, chatJid, lastText);
     const communityBlock = (() => {
       try {
@@ -220,7 +233,7 @@ export class SocialOrchestrator {
       buildSystemPrompt({
         chatName,
         isGroup: last.isGroup,
-        recentMessages: recent.slice(0, Math.max(0, recent.length - burst.length)),
+        recentMessages: history,
         incoming: humanMessages.map((m) => ({ sender: displayName(m), text: m.text ?? '' })),
         webResults: memoryBlock ? `Fakta grup terkait:\n${memoryBlock}` : undefined,
         community: communityBlock ?? undefined,
@@ -266,7 +279,7 @@ export class SocialOrchestrator {
         log.info({ reason: validation.reason }, 'reply rejected by validator');
         return;
       }
-      const contextText = recent.map((m) => `${m.sender}: ${m.text}`).join('\n');
+      const contextText = history.map((m) => `${m.sender}: ${m.text}`).join('\n');
       const reply = hasUnverifiableClaim(validation.text, contextText)
         ? nextTruthFallback()
         : validation.text;
@@ -292,6 +305,38 @@ export class SocialOrchestrator {
         sourceMsgId: m.sourceMsgId,
       }).catch((err) => log.warn({ err }, 'memory write failed'));
     }
+  }
+
+  /**
+   * Durable history for the prompt: the last persisted rows of this chat,
+   * excluding the current burst (it gets its own prompt section), rendered
+   * oldest→newest with consistent sender labels — pushName when known, a
+   * remembered label for senders whose older rows lack one, `userXXXX`
+   * otherwise. Our own rows are labeled 'omak' so the model can track its
+   * earlier replies. Query is bounded (30 rows, timestamp-indexed) so the
+   * per-reply cost stays flat on the small VM.
+   */
+  private async buildHistory(
+    chatJid: string,
+    burst: NormalizedMessage[],
+  ): Promise<PromptContextMessage[]> {
+    const rows = await listRecentMessages(this.deps.db, chatJid, 30).catch(() => []);
+    if (rows.length === 0) return [];
+    const burstIds = new Set(burst.map((m) => m.id));
+    const nameByJid = new Map<string, string>();
+    for (const m of burst) {
+      if (!m.isFromMe && m.pushName) nameByJid.set(m.senderJid, m.pushName);
+    }
+    return rows
+      .filter((r) => !burstIds.has(r.id) && (r.text ?? '').length > 0)
+      .reverse()
+      .slice(-20)
+      .map((r) => ({
+        sender: r.isFromMe
+          ? 'omak'
+          : r.pushName ?? nameByJid.get(r.senderJid) ?? fallbackName(r.senderPn ?? r.senderJid),
+        text: r.text ?? '',
+      }));
   }
 
   private replyState(chatJid: string): ChatReplyState & { replyTimes: number[] } {

@@ -63,8 +63,8 @@ digit-loose so both resolve).
 
 ## 6. Database care (Turso)
 
-- Migrations are forward-only and idempotent; current version: 6
-  (`instance_lease`). Never edit applied migrations.
+- Migrations are forward-only and idempotent; current version: 7
+  (`messages-push_name`). Never edit applied migrations.
 - Backup: `turso db export <db> > backup.sql` (or platform snapshots) before
   schema changes; restore by creating a fresh DB and importing, then update
   `TURSO_DATABASE_URL`.

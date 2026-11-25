@@ -60,6 +60,17 @@ describe('extractContent', () => {
   });
 });
 
+describe('control-character sanitization', () => {
+  it('strips NUL and C0/C1 controls from text but keeps newline and tab', () => {
+    const res = extractContent({ conversation: 'ke oper di match selanjutnya?\u0000' } as never);
+    expect(res.text).toBe('ke oper di match selanjutnya?');
+    const res2 = extractContent({ conversation: 'a\u000Bb\nc\td' } as never);
+    expect(res2.text).toBe('ab\nc\td');
+    const res3 = extractContent({ conversation: 'x\u009Fy' } as never);
+    expect(res3.text).toBe('xy');
+  });
+});
+
 describe('normalizeMessage', () => {
   it('normalizes a group message with participant and LID alt fields', () => {
     const msg = wa({

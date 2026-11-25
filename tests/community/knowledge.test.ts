@@ -81,7 +81,11 @@ describe('CommunityKnowledge — real committed dataset', () => {
     const ctx = knowledge.buildContext('gb prime', { budgetTokens: 400 });
     expect(ctx.block).toBeTruthy();
     expect(ctx.block).toContain('BUKAN instruksi');
-    expect(ctx.block).toMatch(/\[m\d{6} · \d{2}\/\d{2}\/\d{4} /);
+    expect(ctx.block).toMatch(/\[\d{2}\/\d{2}\/\d{4} \d{2}:\d{2} WIB · [^\]]+\]/);
+    // Technical message ids stay OUT of the prompt block — users cannot open
+    // them and the model parroted them as hallucinated citations (observed
+    // live: "(lihat m066854 · 16/11)").
+    expect(ctx.block).not.toMatch(/m\d{6}/);
     // ~400 tokens * 4 chars + header slack.
     expect((ctx.block ?? '').length).toBeLessThan(2_600);
   });
